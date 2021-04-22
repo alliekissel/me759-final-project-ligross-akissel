@@ -4,8 +4,8 @@
 #include "rng.h"
 
 // function signatures
-void distance2collision(float MPF);
-void determine_reaction(const float* sig_s, const float* sig_a, const float* sig_t); // TODO_LG possible just to make this a global variable
+float distance2collision(float MFP, float x, float y, float z);
+int determine_reaction(const float sig_s, const float sig_a); // TODO_LG possible just to make this a global variable
 void energy_angle_transfer(float* E, float* u, float* v, float* w);
 
 // TODO slightly concerned about multiple threads touching the same data/ race conditions
@@ -43,13 +43,46 @@ int main(int argc, char* argv[]) {
             // sample reaction (absorbtion or scattering)
                 // if(absoption)
                     // alive = false; or maybe break;
-                // if(scatter)
+                // else if(scatter)
                     // sample/update outgoing E and (u,v,w)
         }
     }
 
+
     return 0;
 }
 
+
+// responsible for sampling exponential distribution and
+// determining if the particle remains in the geometry
+float distance2collision(float MFP, float x, float y, float z){
+    // call sample exponential
+    // determine from current position and direction and 
+    // new distance whether particle is leaving geometry
+    // i.e. compute new x,y,z from old and determine if x*x+y*y+z*z<r*r
+    // if in geometry
+    float d = sample_exponential(MFP);
+    // else
+        // determine length before leaving sphere
+        // d = distance to sphere
+    return d;
+
+}
+
+// TODO_LG possible just to make this a global variable
+int determine_reaction(const float sig_s, const float sig_a){
+    // determine if we have scattering or absorption
+    // if scatter
+    return 0;
+    // if absopriton
+    //return 1;
+}
+
+
+// look into cookbook for isotropic scattering and the energy angle relation
+// TODO_LG_AND_AK look at derivation for own personal curiousity
+void energy_angle_transfer(float* E, float* u, float* v, float* w) {
+    // modify E,u,v,w in a safe way that gives new direction
+}
 
 
