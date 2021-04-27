@@ -21,6 +21,7 @@ void gen_rand_0_to_1_test1(float* random_sequence, int n) {
 }
 
 void gen_rand_0_to_1_test2(float* random_sequence, int n) {
+    // @TODO add line to correct range from [0,1) to [0,1] (Piazza)
     auto seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::mt19937 generator(seed);
     const float min = 0.0, max = 1.0;
@@ -31,6 +32,7 @@ void gen_rand_0_to_1_test2(float* random_sequence, int n) {
 }
 
 void gen_rand_0_to_1_test3(float* random_sequence, int n) {
+    // @TODO add line to correct range from [0,1) to [0,1] (Piazza)
     std::random_device entropy_source;
     std::mt19937 generator(entropy_source());
     const float min = 0.0, max = 1.0;
@@ -41,6 +43,9 @@ void gen_rand_0_to_1_test3(float* random_sequence, int n) {
 }
 
 void plot_randomness() {
+    // @TODO plot histogram to test uniformity of distribution
+    // @TODO plot bitmap for a visual representation of randomness
+    // @TODO possible also do a chi-square or Kolmogorov-Smirnov test for statistical analysis
     
 }
 
