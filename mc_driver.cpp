@@ -3,8 +3,9 @@
 #include <vector>
 #include "rng.h"
 
+
 // function signatures
-float distance2collision(float MFP, float x, float y, float z);
+float distance2collisionfloat distance2collision(float MFP, float x, float y, float z, float r, float u, float v, float w);
 int determine_reaction(const float sig_s, const float sig_a); // TODO_LG possible just to make this a global variable
 void energy_angle_transfer(float* E, float* u, float* v, float* w);
 
@@ -21,6 +22,9 @@ struct ESTIMATOR
     float tally_re;
 };
 
+// create one vector of all the tracks and just append in the looping section
+// post process it with a reduce with multiple threads to do efficientlyl and avoid having
+// many threads tyring to touch the same memory address
 
 // this function is responsible for driving and timing the montecarlo simulation
 // TODO_LG
@@ -55,16 +59,18 @@ int main(int argc, char* argv[]) {
 
 // responsible for sampling exponential distribution and
 // determining if the particle remains in the geometry
-float distance2collision(float MFP, float x, float y, float z){
-    // call sample exponential
+float distance2collision(float MFP, float x, float y, float z, float r, float u, float v, float w){
     // determine from current position and direction and 
     // new distance whether particle is leaving geometry
     // i.e. compute new x,y,z from old and determine if x*x+y*y+z*z<r*r
     // if in geometry
-    float d = sample_exponential(MFP);
-    // else
-        // determine length before leaving sphere
-        // d = distance to sphere
+    float xi = gen_rand_0_to_1();
+    float d = -log(xi)/MFP;
+    // use current position, d , and direction to determine if we exit the sphere
+
+    if(0) { // we exit
+        // determine length inside the sphere
+    }
     return d;
 
 }
@@ -83,6 +89,9 @@ int determine_reaction(const float sig_s, const float sig_a){
 // TODO_LG_AND_AK look at derivation for own personal curiousity
 void energy_angle_transfer(float* E, float* u, float* v, float* w) {
     // modify E,u,v,w in a safe way that gives new direction
+    // should be able to sample an isotropic scattering
+    // compute dot product between new and old solid angle
+    // determine the energy of the new particle from neutron kinematics
 }
 
 
