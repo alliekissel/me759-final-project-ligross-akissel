@@ -1,9 +1,16 @@
 #include <random>
+#include <chrono>
 #include "rng.h"
 
 // generates a number between 0 and 1 with a high quality random number generator
 float gen_rand_0_to_1() {
-    return 0.0f;
+    std::random_device entropy_source;
+    std::mt19937 generator(entropy_source());
+    const float min = 0.0, max = 1.0;
+    // still need to fix range
+    std::uniform_real_distribution<float> dist(min, max);
+    float random_num = dist(generator);
+    return random_num;
 }
 
 // sample a continuous exponential distribution
