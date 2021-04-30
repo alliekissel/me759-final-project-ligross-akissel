@@ -3,10 +3,13 @@
 #include <vector>
 #include "rng.h"
 
-
+#define _USE_MATH_DEFINES
+const float A=1;
 // function signatures
-float distance2collisionfloat distance2collision(float MFP, float x, float y, float z, float r, float u, float v, float w);
-int determine_reaction(const float sig_s, const float sig_a); // TODO_LG possible just to make this a global variable
+
+float distance2collision(float MFP, float x, float y, float z, float r, float u, float v, float w);
+int determine_reaction(const float sig_s, const float sig_a); 
+void sample_isotropic(float* u, float* v, float* w);
 void energy_angle_transfer(float* E, float* u, float* v, float* w);
 
 // TODO slightly concerned about multiple threads touching the same data/ race conditions
@@ -75,23 +78,46 @@ float distance2collision(float MFP, float x, float y, float z, float r, float u,
 
 }
 
-// TODO_LG possible just to make this a global variable
+// accepts non-normalized cross sections and samples to determine reaction type
+// returns 0 for scatter and 1 for absortion
 int determine_reaction(const float sig_s, const float sig_a){
-    // determine if we have scattering or absorption
-    // if scatter
-    return 0;
-    // if absopriton
-    //return 1;
+
+    float norm = sig_s + sig_a;
+    float xi = gen_rand_0_to_1();
+    if(xi < sig_s/norm ) {
+        // scattering event
+        return 0;
+    } else {
+        return 1;
+    }
 }
 
+void sample_isotropic(float* u, float* v, float* w) {
+    // generate a random pair
+    float xi = gen_rand_0_to_1();
+    float eta = gen_rand_0_to_1();
+    *w = 2*xi - 1;
+    *u = cos(2*M_PI*eta) * sqrt(  1 - (*w) * (*w)  );
+    *v = sin(2*M_PI*eta) * sqrt(  1 - (*w) * (*w)  );
+}
 
-// look into cookbook for isotropic scattering and the energy angle relation
-// TODO_LG_AND_AK look at derivation for own personal curiousity
+// determines the outgoing energy and angle of an isotropic, elastic collision
+// assumes mass number is defined above
 void energy_angle_transfer(float* E, float* u, float* v, float* w) {
     // modify E,u,v,w in a safe way that gives new direction
-    // should be able to sample an isotropic scattering
-    // compute dot product between new and old solid angle
-    // determine the energy of the new particle from neutron kinematics
+    // (u,v,w) is incoming direciton
+    // (U,V,W) is outgoing direction
+    float E_in = *E; // store originaal energy 
+    // generate a new isotropic direction
+    float *U;
+    float *V;
+    float *W;
+    sample_isotropic(U,V,W);
+    // compute the dot product between incoming and exiting directions
+    float mu = (*u) * (*U) + (*w) * (*W) + (*v) * (*V);
+    // elastic scattering physics
+    float factor = pow((1/(1+A)),2)*(1+A*A + 2*A*mu) ; 
+    *E = E_in * factor;
 }
 
 
