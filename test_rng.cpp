@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <random>
 #include <chrono>
 
@@ -52,14 +53,23 @@ void plot_randomness() {
 int main(int argc, char *argv[])
 {
     int n = 10;
+    int num_trials = 3;
+    // create file to write output to
+    std::ofstream file;
+    file.open("random_sequences.txt");
+
     // test1
     float random_sequence1[n];
     gen_rand_0_to_1_test1(random_sequence1, n);
 
     std::cout << "Test 1 sequence" << std::endl;
-    for (int i = 0; i < n; i++)
-    {
-        std::cout << random_sequence1[i] << std::endl;
+    for (int j = 0; j < num_trials; j++) {
+        for (int i = 0; i < n; i++)
+        {
+            std::cout << random_sequence1[i] << std::endl;
+            // write sequence to file
+            file << "rs1_" << std::to_string(j) << " " << random_sequence1[i] << "\n";
+        }
     }
     std::cout << std::endl;
 
@@ -68,9 +78,13 @@ int main(int argc, char *argv[])
     gen_rand_0_to_1_test2(random_sequence2, n);
 
     std::cout << "Test 2 sequence" << std::endl;
-    for (int i = 0; i < n; i++)
-    {
-        std::cout << random_sequence2[i] << std::endl;
+    for (int j = 0; j < num_trials; j++) {
+        for (int i = 0; i < n; i++)
+        {
+            std::cout << random_sequence2[i] << std::endl;
+            // write sequence to file
+            file << "rs2_" << std::to_string(j) << " " << random_sequence2[i] << "\n";
+        }
     }
     std::cout << std::endl;
 
@@ -79,11 +93,17 @@ int main(int argc, char *argv[])
     gen_rand_0_to_1_test3(random_sequence3, n);
 
     std::cout << "Test 3 sequence" << std::endl;
-    for (int i = 0; i < n; i++)
-    {
-        std::cout << random_sequence3[i] << std::endl;
+    for (int j = 0; j < num_trials; j++) {
+        for (int i = 0; i < n; i++)
+        {
+            std::cout << random_sequence3[i] << std::endl;
+            // write sequence to file
+            file << "rs3_" << std::to_string(j) << " " << random_sequence3[i] << "\n";
+        }
     }
     std::cout << std::endl;
+    
+    file.close();
 
     return 0;
 }
