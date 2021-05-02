@@ -10,9 +10,9 @@ rs2 = df[df["RNG method"] == "rs2_0"]
 rs3 = df[df["RNG method"] == "rs3_0"]
 
 # plot histogram of each method
-rs1.plot.hist(bins = 15)
-rs2.plot.hist(bins = 15)
-rs3.plot.hist(bins = 15)
+rs1.plot.hist(bins = 10)
+rs2.plot.hist(bins = 10)
+rs3.plot.hist(bins = 10)
 
 # plot line plot of each method
 rs1.plot.line()
