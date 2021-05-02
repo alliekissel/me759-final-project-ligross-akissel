@@ -9,7 +9,7 @@
 const float A=1;
 // function signatures
 
-float distance2collision(float MFP, float x, float y, float z, float r, float u, float v, float w);
+float distance2collision(float MFP, float *x, float *y, float *z, float r, const float u, const float v, const float w, bool *termination);
 int determine_reaction(const float sig_s, const float sig_a); 
 void sample_isotropic(float* u, float* v, float* w);
 void energy_angle_transfer(float* E, float* u, float* v, float* w);
@@ -71,19 +71,44 @@ int main(int argc, char* argv[]) {
 
 // responsible for sampling exponential distribution and
 // determining if the particle remains in the geometry
-float distance2collision(float MFP, float x, float y, float z, float r, float u, float v, float w){
+float distance2collision(float MFP, float *x, float *y, float *z, float r, const float u, const float v, const float w, bool *termination) {
     // determine from current position and direction and 
     // new distance whether particle is leaving geometry
     // i.e. compute new x,y,z from old and determine if x*x+y*y+z*z<r*r
     // if in geometry
     float xi = gen_rand_0_to_1();
     float d = -log(xi)/MFP;
-    // use current position, d , and direction to determine if we exit the sphere
 
-    if(0) { // we exit
+    
+    // the magnitude of the vector of the starting position
+    float mag_A_sq = (*x)*(*x)+(*y)*(*y)+(*z)*(*z);
+    float mag_A = sqrt(mag_A_sq);
+    // the magnitude of the vector for the point the particle is transported to
+    float mag_end_sq = (*x+d*u)*(*x+d*u)+(*y+d*v)*(*y+d*v)+(*z+d*w)*(*z+d*w);
+
+    // determine if the hitsory is terminated by exiting the geometry or if the history will continue
+    if(mag_end_sq > r*r) { 
+        // we exit
         // determine length inside the sphere
+        float costheta = mag_end_sq - mag_A_sq - d*d;
+        costheta /= -(2*mag_A*d);
+
+        float a,b,c;
+        a = 1.0f;
+        b = -2*mag_A*d*costheta;
+        c = mag_A_sq - r*r;
+        float d_i_plus = (-b + sqrt(b*b- 4*a*c))/(2*a);
+        float d_i_minus = (-b - sqrt(b*b - 4*a*c))/(2*a);
+        // check if A + d_i Omega = B, i.e. on sphere before assigning d_i, maybe add function for this?
+        float d_i;
+        *termination = true;
+        return d_i;
+    } else {
+        // position transported to remains inside sphere, continue on to the next history
+        *termination = false;
+        return d;
     }
-    return d;
+
 
 }
 
