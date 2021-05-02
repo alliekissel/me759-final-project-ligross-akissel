@@ -1,10 +1,11 @@
+#define _USE_MATH_DEFINES
+
 #include <iostream>
 #include <cmath>
 #include <vector>
 #include <chrono>
 #include "rng.h"
 
-#define _USE_MATH_DEFINES
 const float A=1;
 // function signatures
 
@@ -35,6 +36,13 @@ struct ESTIMATOR
 int main(int argc, char* argv[]) {
     unsigned int num_histories = atoi(argv[1]); // number of simulations
     unsigned int threads = atoi(argv[2]); // number of threads
+
+    // test RNG consistency between sequences with same seed
+    float* random_sequence = new float[20];
+    for(int i = 0; i < 20; i++) {
+        random_sequence[i] = gen_rand_0_to_1();
+        std::cout << random_sequence[i] << std::endl;
+    }
 
     for(unsigned int i=0; i < num_histories; i++){
         // sample birth particle for energy(TODO_LG perhaps monoenergetic)
