@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <chrono>
 #include "rng.h"
 
 #define _USE_MATH_DEFINES
