@@ -5,9 +5,3 @@ float gen_rand_0_to_1() {
     float random_num = dist(generator);
     return random_num;
 }
-
-// sample a continuous exponential distribution
-float sample_exponential(float mfp){
-    return mfp;
-}
-
