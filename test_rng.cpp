@@ -9,9 +9,6 @@ void gen_rand_0_to_1_test1(float* random_sequence, int n);
 void gen_rand_0_to_1_test2(float* random_sequence, int n);
 // random number generator using a distribution with entropy source as seed
 void gen_rand_0_to_1_test3(float* random_sequence, int n);
-// plot collection of sequences seeded differently and plot on a 2D grid to 
-// demonstrate quality of randomness
-void plot_randomness();
 
 void gen_rand_0_to_1_test1(float* random_sequence, int n) {
     auto seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -43,17 +40,10 @@ void gen_rand_0_to_1_test3(float* random_sequence, int n) {
     }
 }
 
-void plot_randomness() {
-    // @TODO plot histogram to test uniformity of distribution
-    // @TODO plot bitmap for a visual representation of randomness
-    // @TODO possible also do a chi-square or Kolmogorov-Smirnov test for statistical analysis
-    
-}
-
 int main(int argc, char *argv[])
 {
-    int n = 10;
-    int num_trials = 3;
+    int n = 500;
+    int num_trials = 1;
     // create file to write output to
     std::ofstream file;
     file.open("random_sequences.txt");
@@ -62,46 +52,46 @@ int main(int argc, char *argv[])
     float random_sequence1[n];
     gen_rand_0_to_1_test1(random_sequence1, n);
 
-    std::cout << "Test 1 sequence" << std::endl;
+    //std::cout << "Test 1 sequence" << std::endl;
     for (int j = 0; j < num_trials; j++) {
         for (int i = 0; i < n; i++)
         {
-            std::cout << random_sequence1[i] << std::endl;
+            // std::cout << random_sequence1[i] << std::endl;
             // write sequence to file
             file << "rs1_" << std::to_string(j) << " " << random_sequence1[i] << "\n";
         }
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     // test2
     float random_sequence2[n];
     gen_rand_0_to_1_test2(random_sequence2, n);
 
-    std::cout << "Test 2 sequence" << std::endl;
+    //std::cout << "Test 2 sequence" << std::endl;
     for (int j = 0; j < num_trials; j++) {
         for (int i = 0; i < n; i++)
         {
-            std::cout << random_sequence2[i] << std::endl;
+            //std::cout << random_sequence2[i] << std::endl;
             // write sequence to file
             file << "rs2_" << std::to_string(j) << " " << random_sequence2[i] << "\n";
         }
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     // test3
     float random_sequence3[n];
     gen_rand_0_to_1_test3(random_sequence3, n);
 
-    std::cout << "Test 3 sequence" << std::endl;
+    //std::cout << "Test 3 sequence" << std::endl;
     for (int j = 0; j < num_trials; j++) {
         for (int i = 0; i < n; i++)
         {
-            std::cout << random_sequence3[i] << std::endl;
+            //std::cout << random_sequence3[i] << std::endl;
             // write sequence to file
             file << "rs3_" << std::to_string(j) << " " << random_sequence3[i] << "\n";
         }
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
     
     file.close();
 
