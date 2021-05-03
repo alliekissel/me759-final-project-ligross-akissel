@@ -72,31 +72,32 @@ int main(int argc, char* argv[]) {
 // responsible for sampling exponential distribution and
 // determining if the particle remains in the geometry
 float distance2collision(float MFP, float *x, float *y, float *z, float r, const float u, const float v, const float w, bool *termination) {
-    // determine from current position and direction and 
-    // new distance whether particle is leaving geometry
-    // i.e. compute new x,y,z from old and determine if x*x+y*y+z*z<r*r
-    // if in geometry
+    // sample distance to event from exponential distribution
     float xi = gen_rand_0_to_1();
     float d = -log(xi)/MFP;
-
-    
+    // find if final position is inside or outside of sphere
     // the magnitude of the vector of the starting position
     float mag_A_sq = (*x)*(*x)+(*y)*(*y)+(*z)*(*z);
     float mag_A = sqrt(mag_A_sq);
+    // particle travels distance d along direction omega hat (u,v,w) from starting point (x,y,z)
     // the magnitude of the vector for the point the particle is transported to
     float mag_end_sq = (*x+d*u)*(*x+d*u)+(*y+d*v)*(*y+d*v)+(*z+d*w)*(*z+d*w);
 
+
+    // TODO_LG, logic for at the origin since the sphere_checker currently divides by zero in this case
     // determine if the hitsory is terminated by exiting the geometry or if the history will continue
     if(mag_end_sq > r*r) { 
         // we exit
         // determine length inside the sphere
         float costheta = mag_end_sq - mag_A_sq - d*d;
         costheta /= -(2*mag_A*d);
-
+        // determine d_i from quadratic
         float a,b,c;
         a = 1.0f;
         b = -2*mag_A*d*costheta;
         c = mag_A_sq - r*r;
+        // TOOD_LG try and justify that we will always take the plus root, if we can't show this, then just take
+        // which ever is positive between the two below. pray that there is never a case where they are both positive
         float d_i_plus = (-b + sqrt(b*b- 4*a*c))/(2*a);
         float d_i_minus = (-b - sqrt(b*b - 4*a*c))/(2*a);
         // check if A + d_i Omega = B, i.e. on sphere before assigning d_i, maybe add function for this?
@@ -104,12 +105,11 @@ float distance2collision(float MFP, float *x, float *y, float *z, float r, const
         *termination = true;
         return d_i;
     } else {
-        // position transported to remains inside sphere, continue on to the next history
+        // position transported to remains inside sphere all of track contributes
+        // continue on to the next history
         *termination = false;
         return d;
     }
-
-
 }
 
 // accepts non-normalized cross sections and samples to determine reaction type
