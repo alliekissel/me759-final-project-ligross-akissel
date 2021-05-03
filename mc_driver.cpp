@@ -10,9 +10,9 @@ const float A=1;
 // function signatures
 
 float distance2collision(float MFP, float *x, float *y, float *z, float r, const float u, const float v, const float w, bool *termination);
-int determine_reaction(const float sig_s, const float sig_a); 
-void sample_isotropic(float* u, float* v, float* w);
-void energy_angle_transfer(float* E, float* u, float* v, float* w);
+int   determine_reaction(const float sig_s, const float sig_a); 
+void  sample_isotropic(float* u, float* v, float* w);
+void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 
 // TODO slightly concerned about multiple threads touching the same data/ race conditions
 // possible that reduction will be useful
@@ -36,44 +36,63 @@ struct ESTIMATOR
 int main(int argc, char* argv[]) {
     unsigned int num_histories = atoi(argv[1]); // number of simulations
     unsigned int threads = atoi(argv[2]); // number of threads
-
     // test RNG consistency between sequences with same seed
-    float* random_sequence = new float[20];
-    for(int i = 0; i < 20; i++) {
-        random_sequence[i] = gen_rand_0_to_1();
-        std::cout << random_sequence[i] << std::endl;
-    }
+    // float* random_sequence = new float[20];
+    // for(int i = 0; i < 20; i++) {
+    //     random_sequence[i] = gen_rand_0_to_1();
+    //     std::cout << random_sequence[i] << std::endl;
+    // }
 
-    for(unsigned int i=0; i < num_histories; i++){
-        // sample birth particle for energy(TODO_LG perhaps monoenergetic)
-        // sample birth direciton 
-        bool alive = true;
-        while(alive) {
-            // sample distance to collision
-            // compute distance to sphere
-                // if we leave the geometry
-                    // compute track length inside sphere, update tally
-                    // alive = false; or maybe break;
-                // if we stay in geomtery
-                    // update tally with track length contribution
-            // sample reaction (absorbtion or scattering)
-                // if(absoption)
-                    // alive = false; or maybe break;
-                // else if(scatter)
-                    // sample/update outgoing E and (u,v,w)
-            alive = false;
+    std::vector<float> tracks;
+    float r = 5.0f; // units in cm
+    // cross sectin data
+    const float sig_s = 0.9; // units in per cm
+    const float sig_a = 0.1; // units in per cm
+    const float sig_t = sig_s + sig_a;
+    float mfp = 1/sig_t;
+    float *x , *y , *z; // position pointers, units of cm
+    float *u,*v,*w,*E;  // direction and energy pointers
+    for(unsigned int i=0; i < num_histories; i++) {
+        bool* terminate; // boolean pointer to determine if history has terminated
+        *terminate = false; // do not terminate simulation until a history-ending event occurs
+        *x = 0.0f ; *y= 0.0f ; *z=0.0f ; *E=100.0f; // each new history starts at the origin with energy 100
+        sample_isotropic(u,v,w); // initial direction sampled from isotropic distribution
+        while(!terminate) { // use alive as what we pass to d2c
+            float d = distance2collision(mfp,x,y,z,r,*u,*v,*w,terminate);
+            tracks.push_back(d);
+            if(terminate) {
+                // particle has escaped geometry as d2c modified terminate to be true, continue to next history
+                continue;
+            } else {
+                // the particle history has not terminated by leaving the geometry
+                // sample reaction type
+                int rxn = determine_reaction(sig_s,sig_a);
+                if(rxn==0) {
+                    // scattering event
+                    energy_angle_transfer(E,u,v,w); // determine outgoing direction and outgoing energy
+                } else{
+                    // absorption event, history is terminated
+                    *terminate=true;
+                }
+            }
         }
     }
+
+    // PROCESS tracks
+    for(unsigned int n_tracks = 0 ; n_tracks < tracks.size() ; n_tracks++) {
+        std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
+    }
+
     return 0;
 }
 
 
 // responsible for sampling exponential distribution and
 // determining if the particle remains in the geometry
-float distance2collision(float MFP, float *x, float *y, float *z, float r, const float u, const float v, const float w, bool *termination) {
+float distance2collision(float mac_XS, float *x, float *y, float *z, const float r, const float u, const float v, const float w, bool *termination) {
     // sample distance to event from exponential distribution
     float xi = gen_rand_0_to_1();
-    float d = -log(xi)/MFP;
+    float d = -log(xi)/mac_XS; // units of cm
     // find if final position is inside or outside of sphere
     float mag_A_sq = (*x)*(*x)+(*y)*(*y)+(*z)*(*z);
     float mag_A = sqrt(mag_A_sq);
@@ -128,6 +147,7 @@ int determine_reaction(const float sig_s, const float sig_a){
         // scattering event
         return 0;
     } else {
+        // absorption event
         return 1;
     }
 }
