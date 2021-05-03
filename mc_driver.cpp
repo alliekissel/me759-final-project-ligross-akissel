@@ -50,15 +50,20 @@ int main(int argc, char* argv[]) {
     const float sig_a = 0.1; // units in per cm
     const float sig_t = sig_s + sig_a;
     float mfp = 1/sig_t;
-    float *x , *y , *z; // position pointers, units of cm
+    float *x, *y, *z; // position pointers, units of cm
     float *u,*v,*w,*E;  // direction and energy pointers
     for(unsigned int i=0; i < num_histories; i++) {
+        std::cout<<"made it to loop " << i <<std::endl;
         bool* terminate; // boolean pointer to determine if history has terminated
         *terminate = false; // do not terminate simulation until a history-ending event occurs
         *x = 0.0f ; *y= 0.0f ; *z=0.0f ; *E=100.0f; // each new history starts at the origin with energy 100
+        *u = 0.0f ; *v = 0.0f; *w=0.0f;
         sample_isotropic(u,v,w); // initial direction sampled from isotropic distribution
+        std::cout<< "made it past isotropic sample" << std::endl;
         while(!terminate) { // use alive as what we pass to d2c
+            std::cout<< "made it while loop" << i <<std::endl;
             float d = distance2collision(mfp,x,y,z,r,*u,*v,*w,terminate);
+            std::cout << "d = " << d <<std::endl;
             tracks.push_back(d);
             if(terminate) {
                 // particle has escaped geometry as d2c modified terminate to be true, continue to next history
@@ -77,7 +82,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-
+    std::cout<<"made it here" <<std::endl;
     // PROCESS tracks
     for(unsigned int n_tracks = 0 ; n_tracks < tracks.size() ; n_tracks++) {
         std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
@@ -140,7 +145,6 @@ float distance2collision(float mac_XS, float *x, float *y, float *z, const float
 // accepts non-normalized cross sections and samples to determine reaction type
 // returns 0 for scatter and 1 for absortion
 int determine_reaction(const float sig_s, const float sig_a){
-
     float norm = sig_s + sig_a;
     float xi = gen_rand_0_to_1();
     if(xi < sig_s/norm ) {
@@ -153,9 +157,11 @@ int determine_reaction(const float sig_s, const float sig_a){
 }
 
 void sample_isotropic(float* u, float* v, float* w) {
+    std::cout << "made it into sample isotropic function" << std::endl;
     // generate a random pair
     float xi = gen_rand_0_to_1();
     float eta = gen_rand_0_to_1();
+    std::cout << xi << " , " << eta <<std::endl;
     *w = 2*xi - 1;
     *u = cos(2*M_PI*eta) * sqrt(  1 - (*w) * (*w)  );
     *v = sin(2*M_PI*eta) * sqrt(  1 - (*w) * (*w)  );
