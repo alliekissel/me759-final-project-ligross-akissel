@@ -9,3 +9,6 @@
 
 g++ mc_driver.cpp rng.cpp -o simulation
 ./simulation 100 1
+
+# for debugging
+# g++ mc_driver.cpp rng.cpp -o simulation -g 
