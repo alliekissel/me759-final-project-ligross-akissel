@@ -59,12 +59,13 @@ int main(int argc, char* argv[]) {
         u = 0.0f ; v = 0.0f; w=0.0f;
         sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
         while(!terminate) { // use alive as what we pass to d2c
-            std::cout<< "made it while loop" << i <<std::endl;
+            std::cout<< "made it while loop " << i <<std::endl;
             float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
             std::cout << "d = " << d <<std::endl;
             tracks.push_back(d);
             if(terminate) {
                 // particle has escaped geometry as d2c modified terminate to be true, continue to next history
+                std::cout << "d2c caused a termination by exiting the geometry" << std::endl;
                 continue;
             } else {
                 // the particle history has not terminated by leaving the geometry
@@ -72,10 +73,12 @@ int main(int argc, char* argv[]) {
                 int rxn = determine_reaction(sig_s,sig_a);
                 if(rxn==0) {
                     // scattering event
+                    std::cout << "scatter" << std::endl;
                     energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
                     std::cout << "scatter" << std::endl;
                 } else{
                     // absorption event, history is terminated
+                    std::cout << "absorbed" << std::endl;
                     terminate=true;
                     std::cout << "absorbed" << std::endl;
                 }
@@ -167,21 +170,25 @@ void sample_isotropic(float* u, float* v, float* w) {
 }
 
 // determines the outgoing energy and angle of an isotropic, elastic collision
-// assumes mass number is defined above
+// assumes mass number A is defined in the #include/#define section
 void energy_angle_transfer(float* E, float* u, float* v, float* w) {
     // modify E,u,v,w in a safe way that gives new direction
     // (u,v,w) is incoming direciton
     // (U,V,W) is outgoing direction
     float E_in = *E; // store originaal energy 
     // generate a new isotropic direction
-    float *U;
-    float *V;
-    float *W;
-    sample_isotropic(U,V,W);
+    float U;
+    float V;
+    float W;
+    sample_isotropic(&U,&V,&W);
     // compute the dot product between incoming and exiting directions
-    float mu = (*u) * (*U) + (*w) * (*W) + (*v) * (*V);
+    float mu = (*u) * (U) + (*w) * (W) + (*v) * (V);
     // elastic scattering physics
     float factor = pow((1/(1+A)),2)*(1+A*A + 2*A*mu) ; 
+    // update direction and energy for next event
+    *u = U;
+    *v = V;
+    *w = W;
     *E = E_in * factor;
 }
 
