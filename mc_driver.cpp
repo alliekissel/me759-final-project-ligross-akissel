@@ -36,12 +36,6 @@ struct ESTIMATOR
 int main(int argc, char* argv[]) {
     unsigned int num_histories = atoi(argv[1]); // number of simulations
     unsigned int threads = atoi(argv[2]); // number of threads
-    // test RNG consistency between sequences with same seed
-    // float* random_sequence = new float[20];
-    // for(int i = 0; i < 20; i++) {
-    //     random_sequence[i] = gen_rand_0_to_1();
-    //     std::cout << random_sequence[i] << std::endl;
-    // }
 
     std::vector<float> tracks;
     float r = 5.0f; // units in cm
@@ -53,19 +47,15 @@ int main(int argc, char* argv[]) {
     float x, y, z; // position variables, units of cm
     float u,v,w,E;  // direction and energy
     for(unsigned int i=0; i < num_histories; i++) {
-        std::cout<<"made it to loop " << i <<std::endl;
         bool terminate = false; // do not terminate simulation until a history-ending event occurs
         x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
         u = 0.0f ; v = 0.0f; w=0.0f;
         sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
-        while(!terminate) { // use alive as what we pass to d2c
-            std::cout<< "made it while loop " << i <<std::endl;
+        while(!terminate) { 
             float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-            std::cout << "d = " << d <<std::endl;
             tracks.push_back(d);
             if(terminate) {
                 // particle has escaped geometry as d2c modified terminate to be true, continue to next history
-                std::cout << "d2c caused a termination by exiting the geometry" << std::endl;
                 continue;
             } else {
                 // the particle history has not terminated by leaving the geometry
@@ -73,25 +63,22 @@ int main(int argc, char* argv[]) {
                 int rxn = determine_reaction(sig_s,sig_a);
                 if(rxn==0) {
                     // scattering event
-                    std::cout << "scatter" << std::endl;
                     energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
-                    std::cout << "scatter" << std::endl;
                 } else{
                     // absorption event, history is terminated
-                    std::cout << "absorbed" << std::endl;
                     terminate=true;
-                    std::cout << "absorbed" << std::endl;
                 }
             }
         }
+
     }
-    std::cout<<"made it here" <<std::endl;
-    // PROCESS tracks
+
+    // Process tracks
     for(unsigned int n_tracks = 0 ; n_tracks < tracks.size() ; n_tracks++) {
         std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
     }
 
-    //TODO_LG add post processing tracks to get an estimator
+
     return 0;
 }
 
@@ -161,7 +148,6 @@ int determine_reaction(const float sig_s, const float sig_a){
 }
 
 void sample_isotropic(float* u, float* v, float* w) {
-    std::cout << "made it into sample isotropic function" << std::endl;
     // generate a random pair
     float xi = gen_rand_0_to_1();
     float eta = gen_rand_0_to_1();
