@@ -91,6 +91,7 @@ int main(int argc, char* argv[]) {
         std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
     }
 
+    //TODO_LG add post processing tracks to get an estimator
     return 0;
 }
 
