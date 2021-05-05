@@ -9,7 +9,7 @@
 const float A=1;
 // function signatures
 
-float distance2collision(float MFP, float *x, float *y, float *z, float r, const float u, const float v, const float w, bool *termination);
+float distance2collision(float mac_XS, float *x, float *y, float *z, const float r, const float u, const float v, const float w, bool *termination) ;
 int   determine_reaction(const float sig_s, const float sig_a); 
 void  sample_isotropic(float* u, float* v, float* w);
 void  energy_angle_transfer(float* E, float* u, float* v, float* w);
@@ -50,19 +50,17 @@ int main(int argc, char* argv[]) {
     const float sig_a = 0.1; // units in per cm
     const float sig_t = sig_s + sig_a;
     float mfp = 1/sig_t;
-    float *x, *y, *z; // position pointers, units of cm
-    float *u,*v,*w,*E;  // direction and energy pointers
+    float x, y, z; // position variables, units of cm
+    float u,v,w,E;  // direction and energy
     for(unsigned int i=0; i < num_histories; i++) {
         std::cout<<"made it to loop " << i <<std::endl;
-        bool* terminate; // boolean pointer to determine if history has terminated
-        *terminate = false; // do not terminate simulation until a history-ending event occurs
-        *x = 0.0f ; *y= 0.0f ; *z=0.0f ; *E=100.0f; // each new history starts at the origin with energy 100
-        *u = 0.0f ; *v = 0.0f; *w=0.0f;
-        sample_isotropic(u,v,w); // initial direction sampled from isotropic distribution
-        std::cout<< "made it past isotropic sample" << std::endl;
+        bool terminate = false; // do not terminate simulation until a history-ending event occurs
+        x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
+        u = 0.0f ; v = 0.0f; w=0.0f;
+        sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
         while(!terminate) { // use alive as what we pass to d2c
             std::cout<< "made it while loop" << i <<std::endl;
-            float d = distance2collision(mfp,x,y,z,r,*u,*v,*w,terminate);
+            float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
             std::cout << "d = " << d <<std::endl;
             tracks.push_back(d);
             if(terminate) {
@@ -74,10 +72,12 @@ int main(int argc, char* argv[]) {
                 int rxn = determine_reaction(sig_s,sig_a);
                 if(rxn==0) {
                     // scattering event
-                    energy_angle_transfer(E,u,v,w); // determine outgoing direction and outgoing energy
+                    energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
+                    std::cout << "scatter" << std::endl;
                 } else{
                     // absorption event, history is terminated
-                    *terminate=true;
+                    terminate=true;
+                    std::cout << "absorbed" << std::endl;
                 }
             }
         }
@@ -161,7 +161,6 @@ void sample_isotropic(float* u, float* v, float* w) {
     // generate a random pair
     float xi = gen_rand_0_to_1();
     float eta = gen_rand_0_to_1();
-    std::cout << xi << " , " << eta <<std::endl;
     *w = 2*xi - 1;
     *u = cos(2*M_PI*eta) * sqrt(  1 - (*w) * (*w)  );
     *v = sin(2*M_PI*eta) * sqrt(  1 - (*w) * (*w)  );
