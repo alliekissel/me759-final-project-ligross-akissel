@@ -9,6 +9,10 @@
 const float A=1;
 // function signatures
 
+
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
+
 float distance2collision(float mac_XS, float *x, float *y, float *z, const float r, const float u, const float v, const float w, bool *termination) ;
 int   determine_reaction(const float sig_s, const float sig_a); 
 void  sample_isotropic(float* u, float* v, float* w);
@@ -37,6 +41,18 @@ int main(int argc, char* argv[]) {
     unsigned int num_histories = atoi(argv[1]); // number of simulations
     unsigned int threads = atoi(argv[2]); // number of threads
 
+
+    // timing variables for the history portion
+    high_resolution_clock::time_point start_histories;
+    high_resolution_clock::time_point end_histories; 
+    duration<float, std::milli> duration_ms_histories;
+    // timing variables for the estimator portion
+    high_resolution_clock::time_point start_estimator;
+    high_resolution_clock::time_point end_estimator; 
+    duration<float, std::milli> duration_ms_estimator;
+    // total time
+    duration<float, std::milli> duration_total;
+
     std::vector<float> tracks;
     float r = 5.0f; // units in cm
     // cross sectin data
@@ -46,6 +62,7 @@ int main(int argc, char* argv[]) {
     float mfp = 1/sig_t;
     float x, y, z; // position variables, units of cm
     float u,v,w,E;  // direction and energy
+    start_histories = high_resolution_clock::now();
     for(unsigned int i=0; i < num_histories; i++) {
         bool terminate = false; // do not terminate simulation until a history-ending event occurs
         x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
@@ -71,13 +88,22 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+    end_histories = high_resolution_clock::now();
+    duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
 
+
+    
+    start_estimator = high_resolution_clock::now();
     // Process tracks
     for(unsigned int n_tracks = 0 ; n_tracks < tracks.size() ; n_tracks++) {
         std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
     }
+    end_estimator = high_resolution_clock::now();
+    duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (start_estimator - end_estimator);
 
-
+    std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
+    std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
+    std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
     return 0;
 }
 
