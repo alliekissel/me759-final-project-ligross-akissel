@@ -6,6 +6,9 @@
 #include <chrono>
 #include "rng.h"
 
+// taskloop documentation, with examples, IBM:
+// https://www.ibm.com/docs/en/xl-c-and-cpp-linux/16.1.1?topic=parallelization-pragma-omp-taskloop
+
 const float A=1;
 // function signatures
 
@@ -46,6 +49,10 @@ int main(int argc, char* argv[]) {
     float mfp = 1/sig_t;
     float x, y, z; // position variables, units of cm
     float u,v,w,E;  // direction and energy
+
+    #pragma omp parallel 
+    #pragma omp single
+    #pragma omp taskloop num_tasks(20) // 20 is the maximum
     for(unsigned int i=0; i < num_histories; i++) {
         bool terminate = false; // do not terminate simulation until a history-ending event occurs
         x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
