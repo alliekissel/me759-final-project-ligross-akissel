@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 #include <chrono>
+#include <omp.h>
 #include "rng.h"
 
 // taskloop documentation, with examples, IBM:
