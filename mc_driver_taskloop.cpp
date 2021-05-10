@@ -44,6 +44,8 @@ int main(int argc, char* argv[]) {
     unsigned int num_histories = atoi(argv[1]); // number of simulations
     unsigned int threads = atoi(argv[2]); // number of threads
 
+    omp_set_num_threads(threads);
+
     // timing variables for the history portion
     high_resolution_clock::time_point start_histories;
     high_resolution_clock::time_point end_histories; 
@@ -68,6 +70,7 @@ int main(int argc, char* argv[]) {
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
     #pragma omp parallel 
+    {
     #pragma omp single
     #pragma omp taskloop num_tasks(20) // 20 is the maximum
     for(unsigned int i=0; i < num_histories; i++) {
@@ -94,6 +97,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+    }
     }
 
     end_histories = high_resolution_clock::now();
