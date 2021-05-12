@@ -91,8 +91,6 @@ int main(int argc, char* argv[]) {
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
 
-
-    
     start_estimator = high_resolution_clock::now();
     float flux; // flux estimator
     float RE; // relative error
@@ -105,13 +103,18 @@ int main(int argc, char* argv[]) {
         flux += it->first;
     }
     // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
-    flux *= 1/(num_histories*V);
+    flux /= num_histories*V;
 
-    // COMPUTE RE TODO LG
+
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
+    // initialize iterator at beginning of tracks vector
+    std::vector<std::pair<float,int> >::const_iterator it = tracks.begin();
     for(unsigned int i=0 ; i < num_histories ; i++) {
         // go through all tracks for given i in vector of pairs
-        // TODO_LG
+        while(i==it->second){
+            scores[i] += it->first; // add the flux to the current score
+            it++; // go to the next track in the queue
+        }
     }
 
     // process scores into a relative error
