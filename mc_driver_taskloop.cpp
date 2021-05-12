@@ -70,9 +70,8 @@ int main(int argc, char* argv[]) {
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
     #pragma omp parallel 
-    {
     #pragma omp single
-    #pragma omp taskloop num_tasks(20) // 20 is the maximum
+    #pragma omp taskloop 
     for(unsigned int i=0; i < num_histories; i++) {
         bool terminate = false; // do not terminate simulation until a history-ending event occurs
         x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
@@ -98,7 +97,6 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-    }
 
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
@@ -108,7 +106,7 @@ int main(int argc, char* argv[]) {
     // Process tracks
     #pragma omp parallel for // this will likely be a reduction later
     for(unsigned int n_tracks = 0 ; n_tracks < tracks.size() ; n_tracks++) {
-        std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
+        //std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
     }
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (start_estimator - end_estimator);
