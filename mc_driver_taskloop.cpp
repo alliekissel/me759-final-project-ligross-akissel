@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     // total time
     duration<float, std::milli> duration_total;
 
-    std::vector<float> tracks;
+    std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
         sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
         while(!terminate) { 
             float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-            tracks.push_back(d);
+            tracks.push_back(std::make_pair(d,i));
             if(terminate) {
                 // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                 continue;
