@@ -109,6 +109,7 @@ int main(int argc, char* argv[]) {
 
     // COMPUTE FLUX TODO LG
     // Add all tracks to flux
+    #pragma omp parallel for shared(tracks) reduction(+:flux)
     for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
         flux += it->first;
     }
