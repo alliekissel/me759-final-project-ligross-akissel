@@ -101,13 +101,47 @@ int main(int argc, char* argv[]) {
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
     
-    // begin timing estimator and parallelization
     start_estimator = high_resolution_clock::now();
-    // Process tracks
-    #pragma omp parallel for // this will likely be a reduction later
-    for(unsigned int n_tracks = 0 ; n_tracks < tracks.size() ; n_tracks++) {
-        //std::cout << "track no: " << n_tracks << " has length " <<  tracks[n_tracks] << std::endl;
+    float flux; // flux estimator
+    float RE; // relative error
+    float V = 4/3*M_PI*r*r*r; // vollume
+    std::vector<float> scores; // compute the score for each particle in order to compute a relative error
+
+    // COMPUTE FLUX TODO LG
+    // Add all tracks to flux
+    for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
+        flux += it->first;
     }
+    // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
+    flux /= num_histories*V;
+
+
+    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
+    // initialize iterator at beginning of tracks vector
+    std::vector<std::pair<float,int> >::const_iterator it = tracks.begin();
+    for(unsigned int i=0 ; i < num_histories ; i++) {
+        // go through all tracks for given i in vector of pairs
+        while(i==it->second){
+            scores[i] += it->first; // add the flux to the current score
+            it++; // go to the next track in the queue
+        }
+    }
+
+    // process scores into a relative error
+    // sum the squares
+    for(unsigned int i=0 ; i < num_histories ; i++) {
+        RE += scores[i] * scores[i];
+    }
+    RE/=num_histories;
+    float subtractor;
+    for(unsigned int i=0 ; i < num_histories ; i++) {
+        // TODO_LG
+        subtractor+=scores[i]/num_histories;
+    }
+    // square the subtractor
+    subtractor*=subtractor;
+    // correct RE
+    RE -= subtractor;
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (start_estimator - end_estimator);
 
