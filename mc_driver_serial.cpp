@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
     float V = 4/3*M_PI*r*r*r; // vollume
     std::vector<float> scores; // compute the score for each particle in order to compute a relative error
 
-    // COMPUTE FLUX TODO LG
+
     // Add all tracks to flux
     for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
         flux += it->first;
@@ -105,17 +105,33 @@ int main(int argc, char* argv[]) {
     // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
     flux /= num_histories*V;
 
-
+    //std::cout << "made it here " << std::endl;
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
     // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::const_iterator it = tracks.begin();
+    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
     for(unsigned int i=0 ; i < num_histories ; i++) {
         // go through all tracks for given i in vector of pairs
-        while(i==it->second){
-            scores[i] += it->first; // add the flux to the current score
-            it++; // go to the next track in the queue
+        float accumulator = 0.0f;
+        while(i==score_computer_it->second){
+            accumulator += score_computer_it->first; // add the flux to the current score
+            score_computer_it++; // go to the next track in the queue
         }
+        scores.push_back(accumulator);
     }
+    std::cout << "here" << std::endl;
+    int track_no = 1;
+    std::vector<std::pair<float,int> >::const_iterator test_it = tracks.begin(); 
+    //testing scores
+    for(unsigned int i=0 ; i < num_histories ; i++) {
+        std::cout << "history " << i << " begins " << std::endl;
+        while(i==test_it->second){
+            std::cout << "track " << track_no << " has value " << test_it->first << std::endl;; // add the flux to the current score
+            track_no++; test_it++; // go to the next track in the queue
+        }
+        std::cout << "the score for particle " << i << " is " << scores[i] << std::endl;
+        std::cout << "_______________________________" << std::endl;
+    }
+
 
     // process scores into a relative error
     // sum the squares
