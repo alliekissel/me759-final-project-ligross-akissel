@@ -130,6 +130,7 @@ int main(int argc, char* argv[]) {
     //     std::cout << "_______________________________" << std::endl;
     // }
 
+
     // process scores into a relative error
     // sum the squares
     for(unsigned int i=0 ; i < num_histories ; i++) {
@@ -148,10 +149,18 @@ int main(int argc, char* argv[]) {
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
 
-    std::cout << "estimator is " << flux << " relative error is " << RE << std::endl;
-    std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
-    std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
-    std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
+
+    std::cout << flux << "," << RE << "," << 
+                 duration_ms_histories.count() << "," << 
+                 duration_ms_estimator.count() << "," <<  
+                 duration_ms_histories.count() + duration_ms_estimator.count() << std::endl;
+ 
+    // uncomment to see names with values
+    // std::cout << "estimator is " << flux << " relative error is " << RE << std::endl;
+    // std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
+    // std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
+    // std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
+
     return 0;
 }
 
