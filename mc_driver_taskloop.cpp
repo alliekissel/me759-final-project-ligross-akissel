@@ -119,13 +119,14 @@ int main(int argc, char* argv[]) {
 
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
     // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::const_iterator it = tracks.begin();
+    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
     for(unsigned int i=0 ; i < num_histories ; i++) {
-        // go through all tracks for given i in vector of pairs
-        while(i==it->second){
-            scores[i] += it->first; // add the flux to the current score
-            it++; // go to the next track in the queue
+        float accumulator = 0.0f;
+        while(i==score_computer_it->second){
+            accumulator += score_computer_it->first; // add the flux to the current score
+            score_computer_it++; // go to the next track in the queue
         }
+        scores.push_back(accumulator);
     }
 
     // process scores into a relative error
