@@ -66,55 +66,60 @@ int main(int argc, char* argv[]) {
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    for(unsigned int i=0; i < num_histories; i++) {
-        bool terminate = false; // do not terminate simulation until a history-ending event occurs
-        x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
-        u = 0.0f ; v = 0.0f; w=0.0f;
-        sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
-        while(!terminate) { 
-            float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-            tracks.push_back(std::make_pair(d,i));
-            if(terminate) {
-                // particle has escaped geometry as d2c modified terminate to be true, continue to next history
-                continue;
-            } else {
-                // the particle history has not terminated by leaving the geometry
-                // sample reaction type
-                int rxn = determine_reaction(sig_s,sig_a);
-                if(rxn==0) {
-                    // scattering event
-                    energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
-                } else{
-                    // absorption event, history is terminated
-                    terminate=true;
+    #pragma parallel
+    {
+        #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history (iteration) has a stochastic number of tracks
+        for(unsigned int i=0; i < num_histories; i++) {
+            bool terminate = false; // do not terminate simulation until a history-ending event occurs
+            x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
+            u = 0.0f ; v = 0.0f; w=0.0f;
+            sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
+            while(!terminate) { 
+                float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
+                tracks.push_back(std::make_pair(d,i));
+                if(terminate) {
+                    // particle has escaped geometry as d2c modified terminate to be true, continue to next history
+                    continue;
+                } else {
+                    // the particle history has not terminated by leaving the geometry
+                    // sample reaction type
+                    int rxn = determine_reaction(sig_s,sig_a);
+                    if(rxn==0) {
+                        // scattering event
+                        energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
+                    } else {
+                        // absorption event, history is terminated
+                        terminate=true;
+                    }
                 }
             }
         }
-    }
-
+    } // end parallel region
     end_histories = high_resolution_clock::now();
-    duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
-    
+    duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
+
     start_estimator = high_resolution_clock::now();
-    float flux; // flux estimator
-    float RE; // relative error
+    float flux = 0.0f; // flux estimator
+    float RE = 0.0f; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
     std::vector<float> scores; // compute the score for each particle in order to compute a relative error
 
-    // COMPUTE FLUX TODO LG
     // Add all tracks to flux
-    #pragma omp parallel for shared(tracks) reduction(+:flux)
-    for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
-        flux += it->first;
-    }
+    #pragma omp parallel 
+    {
+        #pragma for reduction(+:flux)
+        for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
+            flux += it->first;
+        }
+    } // end parallel region
     // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
     flux /= num_histories*V;
-
 
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
     // initialize iterator at beginning of tracks vector
     std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
     for(unsigned int i=0 ; i < num_histories ; i++) {
+        // go through all tracks for given i in vector of pairs
         float accumulator = 0.0f;
         while(i==score_computer_it->second){
             accumulator += score_computer_it->first; // add the flux to the current score
@@ -122,6 +127,20 @@ int main(int argc, char* argv[]) {
         }
         scores.push_back(accumulator);
     }
+
+    // int track_no = 1;
+    // std::vector<std::pair<float,int> >::const_iterator test_it = tracks.begin();
+    // //testing scores
+    // for(unsigned int i=0 ; i < num_histories ; i++) {
+    //     std::cout << "history " << i << " begins " << std::endl;
+    //     while(i==test_it->second){
+    //         std::cout << "track " << track_no << " has value " << test_it->first << std::endl;; // add the flux to the current score
+    //         track_no++; test_it++; // go to the next track in the queue
+    //     }
+    //     std::cout << "the score for particle " << i << " is " << scores[i] << std::endl;
+    //     std::cout << "_______________________________" << std::endl;
+    // }
+
 
     // process scores into a relative error
     // sum the squares
@@ -139,12 +158,19 @@ int main(int argc, char* argv[]) {
     // correct RE
     RE -= subtractor;
     end_estimator = high_resolution_clock::now();
-    duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (start_estimator - end_estimator);
+    duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
 
-    std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
-    std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
-    std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
 
+    std::cout << flux << "," << RE << "," << 
+                 duration_ms_histories.count() << "," << 
+                 duration_ms_estimator.count() << "," <<  
+                 duration_ms_histories.count() + duration_ms_estimator.count() << std::endl;
+ 
+    // uncomment to see names with values
+    // std::cout << "estimator is " << flux << " relative error is " << RE << std::endl;
+    // std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
+    // std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
+    // std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
 
     return 0;
 }
