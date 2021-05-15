@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     start_histories = high_resolution_clock::now();
     #pragma parallel
     {
-        #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history (iteration) has a stochastic number of tracks
+        #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(unsigned int i=0; i < num_histories; i++) {
             bool terminate = false; // do not terminate simulation until a history-ending event occurs
             x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
@@ -105,61 +105,53 @@ int main(int argc, char* argv[]) {
     std::vector<float> scores; // compute the score for each particle in order to compute a relative error
 
     // Add all tracks to flux
-    #pragma omp parallel 
+    #pragma omp parallel
     {
-        #pragma for reduction(+:flux)
+        #pragma omp for simd reduction(+:flux)
         for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
             flux += it->first;
         }
-    } // end parallel region
-    // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
-    flux /= num_histories*V;
 
-    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
-    // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
-    for(unsigned int i=0 ; i < num_histories ; i++) {
-        // go through all tracks for given i in vector of pairs
-        float accumulator = 0.0f;
-        while(i==score_computer_it->second){
-            accumulator += score_computer_it->first; // add the flux to the current score
-            score_computer_it++; // go to the next track in the queue
+        // compute vector of scores, i.e. score for each particle. analog, so weight is 1
+        // initialize iterator at beginning of tracks vector
+        std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
+        #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
+        for(unsigned int i=0 ; i < num_histories ; i++) {
+            // go through all tracks for given i in vector of pairs
+            float accumulator = 0.0f;
+            while(i==score_computer_it->second){
+                accumulator += score_computer_it->first; // add the flux to the current score
+                score_computer_it++; // go to the next track in the queue
+            }
+            scores.push_back(accumulator);
         }
-        scores.push_back(accumulator);
-    }
+        flux /= num_histories*V;
+    } // end parallel region
 
-    // int track_no = 1;
-    // std::vector<std::pair<float,int> >::const_iterator test_it = tracks.begin();
-    // //testing scores
-    // for(unsigned int i=0 ; i < num_histories ; i++) {
-    //     std::cout << "history " << i << " begins " << std::endl;
-    //     while(i==test_it->second){
-    //         std::cout << "track " << track_no << " has value " << test_it->first << std::endl;; // add the flux to the current score
-    //         track_no++; test_it++; // go to the next track in the queue
-    //     }
-    //     std::cout << "the score for particle " << i << " is " << scores[i] << std::endl;
-    //     std::cout << "_______________________________" << std::endl;
-    // }
-
-
-    // process scores into a relative error
-    // sum the squares
-    for(unsigned int i=0 ; i < num_histories ; i++) {
-        RE += scores[i] * scores[i];
-    }
+    #pragma omp parallel 
+    {
+        // process scores into a relative error
+        // sum the squares
+        #pragma omp for simd reduction(+:RE)
+        for(unsigned int i=0 ; i < num_histories ; i++) {
+            RE += scores[i] * scores[i];
+        }
+    } // end parallel region
     RE/=num_histories;
-    float subtractor;
-    for(unsigned int i=0 ; i < num_histories ; i++) {
-        // TODO_LG
-        subtractor+=scores[i]/num_histories;
-    }
+    float subtractor = 0.0f;
+    #pragma omp parallel 
+    {
+        #pragma omp for simd reduction(+:subtractor)
+        for(unsigned int i=0 ; i < num_histories ; i++) {
+            subtractor+=scores[i]/num_histories;
+        }
+    } // end parallel region
     // square the subtractor
     subtractor*=subtractor;
     // correct RE
     RE -= subtractor;
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
-
 
     std::cout << flux << "," << RE << "," << 
                  duration_ms_histories.count() << "," << 
