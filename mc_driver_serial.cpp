@@ -92,8 +92,8 @@ int main(int argc, char* argv[]) {
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
 
     start_estimator = high_resolution_clock::now();
-    float flux; // flux estimator
-    float RE; // relative error
+    float flux = 0.0f; // flux estimator
+    float RE = 0.0f; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
     std::vector<float> scores; // compute the score for each particle in order to compute a relative error
 
