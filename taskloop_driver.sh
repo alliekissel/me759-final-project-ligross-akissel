@@ -7,8 +7,8 @@
 #SBATCH --error="taskloop_sim_timing.err"
 
 
-# g++ mc_driver_taskloop.cpp rng.cpp -o simulation_taskloop
+# g++ mc_driver_taskloop.cpp rng.cpp -o simulation_taskloop -fopenmp
 # ./simulation_taskloop 10000 5
 # TODO add scaling loop
 # for debugging
-g++ -fopenmp mc_driver_taskloop.cpp rng.cpp -o simulation_taskloop -g 
+g++ mc_driver_taskloop.cpp rng.cpp -o simulation_taskloop -fopenmp -g 
