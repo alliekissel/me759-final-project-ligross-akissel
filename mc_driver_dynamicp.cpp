@@ -61,21 +61,24 @@ int main(int argc, char* argv[]) {
     const float sig_a = 0.1; // units in per cm
     const float sig_t = sig_s + sig_a;
     float mfp = 1/sig_t;
-    float x, y, z; // position variables, units of cm
-    float u,v,w,E;  // direction and energy
+    float x,y,z = 0.0f; // position variables, units of cm
+    float u,v,w,E = 0.0f;  // direction and energy
+    float d = 0.0f; // distance to collision
+    bool terminate = false; // should simulation be terminated
+    int rxn = 0;
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    #pragma parallel
+    #pragma omp parallel private(x,y,z,u,v,w,E,d,terminate,rxn)
     {
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(unsigned int i=0; i < num_histories; i++) {
-            bool terminate = false; // do not terminate simulation until a history-ending event occurs
+            terminate = false; // do not terminate simulation until a history-ending event occurs
             x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
             u = 0.0f ; v = 0.0f; w=0.0f;
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
-                float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
+                d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
                 tracks.push_back(std::make_pair(d,i));
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
@@ -83,7 +86,7 @@ int main(int argc, char* argv[]) {
                 } else {
                     // the particle history has not terminated by leaving the geometry
                     // sample reaction type
-                    int rxn = determine_reaction(sig_s,sig_a);
+                    rxn = determine_reaction(sig_s,sig_a);
                     if(rxn==0) {
                         // scattering event
                         energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
@@ -107,25 +110,29 @@ int main(int argc, char* argv[]) {
     // Add all tracks to flux
     #pragma omp parallel
     {
-        #pragma omp for simd reduction(+:flux)
+        #pragma omp for reduction(+:flux)
         for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
             flux += it->first;
         }
+    } // end parallel region
+    flux /= num_histories*V;
 
-        // compute vector of scores, i.e. score for each particle. analog, so weight is 1
-        // initialize iterator at beginning of tracks vector
-        std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
+    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
+    // initialize iterator at beginning of tracks vector
+    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
+    float accumulator = 0.0f;
+    #pragma omp parallel
+    {
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(unsigned int i=0 ; i < num_histories ; i++) {
             // go through all tracks for given i in vector of pairs
-            float accumulator = 0.0f;
+            accumulator = 0.0f;
             while(i==score_computer_it->second){
                 accumulator += score_computer_it->first; // add the flux to the current score
                 score_computer_it++; // go to the next track in the queue
             }
             scores.push_back(accumulator);
         }
-        flux /= num_histories*V;
     } // end parallel region
 
     #pragma omp parallel 
