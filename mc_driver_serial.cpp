@@ -18,25 +18,7 @@ int   determine_reaction(const float sig_s, const float sig_a);
 void  sample_isotropic(float* u, float* v, float* w);
 void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 
-// TODO slightly concerned about multiple threads touching the same data/ race conditions
-// possible that reduction will be useful
-struct ESTIMATOR
-{
-    int n; // the number of particles thus farr
-    // TODO_LG should these be single values or arrays
-    // if single value worry about race conditions/false sharing
-    // if array, process at the end, but number on contributions is stochastic, so size is?
-    // perhaps a vector would be best, so we could append contributions
-    float tally_mean;
-    float tally_re;
-};
-
-// create one vector of all the tracks and just append in the looping section
-// post process it with a reduce with multiple threads to do efficientlyl and avoid having
-// many threads tyring to touch the same memory address
-
 // this function is responsible for driving and timing the montecarlo simulation
-// TODO_LG
 int main(int argc, char* argv[]) {
     int num_histories = atoi(argv[1]); // number of simulations
     int threads = atoi(argv[2]); // number of threads
@@ -53,7 +35,11 @@ int main(int argc, char* argv[]) {
     // total time
     duration<float, std::milli> duration_total;
 
+    // create one vector of all the tracks and just append in the looping section
+    // post process it with a reduce with multiple threads to do efficiently and avoid having
+    // many threads tyring to touch the same memory address
     std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
+
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -102,7 +88,6 @@ int main(int argc, char* argv[]) {
     for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
         flux += it->first;
     }
-    // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
     flux /= num_histories*V;
 
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
@@ -119,29 +104,15 @@ int main(int argc, char* argv[]) {
         scores.push_back(accumulator);
     }
 
-    // int track_no = 1;
-    // std::vector<std::pair<float,int> >::const_iterator test_it = tracks.begin();
-    // //testing scores
-    // for(unsigned int i=0 ; i < num_histories ; i++) {
-    //     std::cout << "history " << i << " begins " << std::endl;
-    //     while(i==test_it->second){
-    //         std::cout << "track " << track_no << " has value " << test_it->first << std::endl;; // add the flux to the current score
-    //         track_no++; test_it++; // go to the next track in the queue
-    //     }
-    //     std::cout << "the score for particle " << i << " is " << scores[i] << std::endl;
-    //     std::cout << "_______________________________" << std::endl;
-    // }
-
-
     // process scores into a relative error
     // sum the squares
     for(int i=0 ; i < num_histories ; i++) {
         RE += scores[i] * scores[i];
     }
     RE/=num_histories;
+    // correct with sum/N squared term
     float subtractor = 0.0f;
     for(int i=0 ; i < num_histories ; i++) {
-        // TODO_LG
         subtractor+=scores[i]/num_histories;
     }
     // square the subtractor
@@ -151,17 +122,11 @@ int main(int argc, char* argv[]) {
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
 
-
+    // print results into CSV format for data visualization analysis 
     std::cout << flux << "," << RE << "," << 
                  duration_ms_histories.count() << "," << 
                  duration_ms_estimator.count() << "," <<  
                  duration_ms_histories.count() + duration_ms_estimator.count() << std::endl;
- 
-    // uncomment to see names with values
-    // std::cout << "estimator is " << flux << " relative error is " << RE << std::endl;
-    // std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
-    // std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
-    // std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
 
     return 0;
 }
