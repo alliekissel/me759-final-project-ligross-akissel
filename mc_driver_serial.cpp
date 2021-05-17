@@ -38,8 +38,8 @@ struct ESTIMATOR
 // this function is responsible for driving and timing the montecarlo simulation
 // TODO_LG
 int main(int argc, char* argv[]) {
-    unsigned int num_histories = atoi(argv[1]); // number of simulations
-    unsigned int threads = atoi(argv[2]); // number of threads
+    int num_histories = atoi(argv[1]); // number of simulations
+    int threads = atoi(argv[2]); // number of threads
 
 
     // timing variables for the history portion
@@ -60,10 +60,11 @@ int main(int argc, char* argv[]) {
     const float sig_a = 0.1; // units in per cm
     const float sig_t = sig_s + sig_a;
     float mfp = 1/sig_t;
-    float x, y, z; // position variables, units of cm
+    float x,y,z; // position variables, units of cm
     float u,v,w,E;  // direction and energy
+
     start_histories = high_resolution_clock::now();
-    for(unsigned int i=0; i < num_histories; i++) {
+    for(int i=0; i < num_histories; i++) {
         bool terminate = false; // do not terminate simulation until a history-ending event occurs
         x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
         u = 0.0f ; v = 0.0f; w=0.0f;
@@ -98,7 +99,7 @@ int main(int argc, char* argv[]) {
     std::vector<float> scores; // compute the score for each particle in order to compute a relative error
 
     // Add all tracks to flux
-    for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
+    for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
         flux += it->first;
     }
     // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
@@ -106,11 +107,12 @@ int main(int argc, char* argv[]) {
 
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
     // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
-    for(unsigned int i=0 ; i < num_histories ; i++) {
+    std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
+    float accumulator = 0.0f;
+    for(int i=0 ; i < num_histories ; i++) {
         // go through all tracks for given i in vector of pairs
-        float accumulator = 0.0f;
-        while(i==score_computer_it->second){
+        accumulator = 0.0f;
+        while(i==score_computer_it->second && score_computer_it < tracks.end() - 1){
             accumulator += score_computer_it->first; // add the flux to the current score
             score_computer_it++; // go to the next track in the queue
         }
@@ -133,12 +135,12 @@ int main(int argc, char* argv[]) {
 
     // process scores into a relative error
     // sum the squares
-    for(unsigned int i=0 ; i < num_histories ; i++) {
+    for(int i=0 ; i < num_histories ; i++) {
         RE += scores[i] * scores[i];
     }
     RE/=num_histories;
-    float subtractor;
-    for(unsigned int i=0 ; i < num_histories ; i++) {
+    float subtractor = 0.0f;
+    for(int i=0 ; i < num_histories ; i++) {
         // TODO_LG
         subtractor+=scores[i]/num_histories;
     }

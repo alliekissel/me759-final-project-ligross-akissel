@@ -55,6 +55,7 @@ int main(int argc, char* argv[]) {
     duration<float, std::milli> duration_total;
 
     std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
+    tracks.push_back(std::make_pair(0.0f,0));
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -79,7 +80,7 @@ int main(int argc, char* argv[]) {
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
                 d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                tracks.push_back(std::make_pair(d,i));
+                //tracks.push_back(std::make_pair(d,i));
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                     continue;
@@ -127,7 +128,7 @@ int main(int argc, char* argv[]) {
         for(unsigned int i=0 ; i < num_histories ; i++) {
             // go through all tracks for given i in vector of pairs
             accumulator = 0.0f;
-            while(i==score_computer_it->second){
+            while (i == score_computer_it->second && score_computer_it < tracks.end() - 1) {
                 accumulator += score_computer_it->first; // add the flux to the current score
                 score_computer_it++; // go to the next track in the queue
             }
@@ -144,17 +145,19 @@ int main(int argc, char* argv[]) {
             RE += scores[i] * scores[i];
         }
     } // end parallel region
-    RE/=num_histories;
+    RE /= num_histories;
+    
     float subtractor = 0.0f;
     #pragma omp parallel 
     {
         #pragma omp for simd reduction(+:subtractor)
         for(unsigned int i=0 ; i < num_histories ; i++) {
-            subtractor+=scores[i]/num_histories;
+            subtractor += scores[i]/num_histories;
         }
     } // end parallel region
+    
     // square the subtractor
-    subtractor*=subtractor;
+    subtractor *= subtractor;
     // correct RE
     RE -= subtractor;
     end_estimator = high_resolution_clock::now();
