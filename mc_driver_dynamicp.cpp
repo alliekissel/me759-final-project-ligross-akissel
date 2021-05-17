@@ -38,8 +38,8 @@ struct ESTIMATOR
 // this function is responsible for driving and timing the montecarlo simulation
 // TODO_LG
 int main(int argc, char* argv[]) {
-    unsigned int num_histories = atoi(argv[1]); // number of simulations
-    unsigned int threads = atoi(argv[2]); // number of threads
+    int num_histories = atoi(argv[1]); // number of simulations
+    int threads = atoi(argv[2]); // number of threads
 
     omp_set_num_threads(threads);
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     duration<float, std::milli> duration_total;
 
     std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
-    tracks.push_back(std::make_pair(0.0f,0));
+    //tracks.push_back(std::make_pair(0.0f,0));
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -73,14 +73,14 @@ int main(int argc, char* argv[]) {
     #pragma omp parallel private(x,y,z,u,v,w,E,d,terminate,rxn)
     {
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
-        for(unsigned int i=0; i < num_histories; i++) {
+        for(int i=0; i < num_histories; i++) {
             terminate = false; // do not terminate simulation until a history-ending event occurs
             x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
             u = 0.0f ; v = 0.0f; w=0.0f;
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
                 d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                //tracks.push_back(std::make_pair(d,i));
+                tracks.push_back(std::make_pair(d,i));
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                     continue;
@@ -98,6 +98,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+        // fill big array pragma omp critical
     } // end parallel region
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
@@ -112,7 +113,7 @@ int main(int argc, char* argv[]) {
     #pragma omp parallel
     {
         #pragma omp for reduction(+:flux)
-        for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
+        for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
             flux += it->first;
         }
     } // end parallel region
@@ -120,12 +121,12 @@ int main(int argc, char* argv[]) {
 
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
     // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
+    std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
     float accumulator = 0.0f;
-    #pragma omp parallel
+    #pragma omp parallel // private accumulator and score_computer_it???
     {
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
-        for(unsigned int i=0 ; i < num_histories ; i++) {
+        for(int i=0 ; i < num_histories ; i++) {
             // go through all tracks for given i in vector of pairs
             accumulator = 0.0f;
             while (i == score_computer_it->second && score_computer_it < tracks.end() - 1) {
@@ -141,7 +142,7 @@ int main(int argc, char* argv[]) {
         // process scores into a relative error
         // sum the squares
         #pragma omp for simd reduction(+:RE)
-        for(unsigned int i=0 ; i < num_histories ; i++) {
+        for(int i=0 ; i < num_histories ; i++) {
             RE += scores[i] * scores[i];
         }
     } // end parallel region
@@ -151,7 +152,7 @@ int main(int argc, char* argv[]) {
     #pragma omp parallel 
     {
         #pragma omp for simd reduction(+:subtractor)
-        for(unsigned int i=0 ; i < num_histories ; i++) {
+        for(int i=0 ; i < num_histories ; i++) {
             subtractor += scores[i]/num_histories;
         }
     } // end parallel region
