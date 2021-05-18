@@ -55,7 +55,6 @@ int main(int argc, char* argv[]) {
     duration<float, std::milli> duration_total;
 
     std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
-    //tracks.push_back(std::make_pair(0.0f,0));
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -72,6 +71,7 @@ int main(int argc, char* argv[]) {
     start_histories = high_resolution_clock::now();
     #pragma omp parallel private(x,y,z,u,v,w,E,d,terminate,rxn)
     {
+        std::vector<std::pair<float,int> > tracks_private; // give each thread their own smaller, private vector
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(int i=0; i < num_histories; i++) {
             terminate = false; // do not terminate simulation until a history-ending event occurs
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
                 d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                tracks.push_back(std::make_pair(d,i));
+                tracks_private.push_back(std::make_pair(d,i));
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                     continue;
@@ -98,8 +98,21 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        // fill big array pragma omp critical
+        #pragma omp barrier
+        #pragma omp critical
+        {
+            std::cout << "I'm thread number " << omp_get_thread_num() << std::endl;
+            for(std::vector<std::pair<float,int> >::iterator it = tracks_private.begin() ; it < tracks_private.end() ; it++) {
+                std::cout << "I am history " << it->second << " and my track length is " << it->first << std::endl;
+            }
+        }
+        #pragma omp critical
+        tracks.insert(tracks.end(), tracks_private.begin(), tracks_private.end()); // each thread dumps it's history into final vector
     } // end parallel region
+    std::cout << "Final vector " << std::endl;
+    for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
+        std::cout << "I am history " << it->second << " and my track length is " << it->first << std::endl;
+    }
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
 
