@@ -98,21 +98,9 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        #pragma omp barrier
-        #pragma omp critical
-        {
-            std::cout << "I'm thread number " << omp_get_thread_num() << std::endl;
-            for(std::vector<std::pair<float,int> >::iterator it = tracks_private.begin() ; it < tracks_private.end() ; it++) {
-                std::cout << "I am history " << it->second << " and my track length is " << it->first << std::endl;
-            }
-        }
         #pragma omp critical
         tracks.insert(tracks.end(), tracks_private.begin(), tracks_private.end()); // each thread dumps it's history into final vector
     } // end parallel region
-    std::cout << "Final vector " << std::endl;
-    for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
-        std::cout << "I am history " << it->second << " and my track length is " << it->first << std::endl;
-    }
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
 
