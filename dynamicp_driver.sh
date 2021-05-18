@@ -8,7 +8,14 @@
 
 
 g++ mc_driver_dynamicp.cpp rng.cpp -o simulation_dynamicp -fopenmp
-./simulation_dynamicp 10000 10
-# TODO add scaling loop
-# for debugging
-# g++ mc_driver_dynamicp.cpp rng.cpp -o simulation_dynamicp -fopenmp -g 
+# thread analysis
+for t in {1..10}
+do
+    ./simulation_dynamicp $((10**4)) $((t))
+done
+
+# scailing analysis for best performing number of threads
+# for i in {4..10}
+# do
+#     ./simulation_dynamicp $((10**i)) THREAD_NO
+# done

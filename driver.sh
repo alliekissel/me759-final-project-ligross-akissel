@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=serialsim
 #SBATCH -p wacc
-#SBATCH --time=0-00:10:00
+#SBATCH --time=0-00:30:00
 #SBATCH --nodes=1 --cpus-per-task=1
 #SBATCH --output="serial_sim_2.out"
 #SBATCH --error="serial_sim.err"

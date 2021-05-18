@@ -7,8 +7,15 @@
 #SBATCH --error="taskp_sim_timing.err"
 
 
-# g++ mc_driver_taskp.cpp rng.cpp -o simulation_taskp
-# ./simulation_taskp 10000 5
-# TODO add scaling loop
-# for debugging
 g++ -fopenmp mc_driver_taskp.cpp rng.cpp -o simulation_taskp -g 
+# thread analysis
+for t in {1..10}
+do
+    ./simulation_taskp $((10**4)) $((t))
+done
+
+# scailing analysis for best performing number of threads
+# for i in {4..10}
+# do
+#     ./simulation_taskp $((10**i)) THREAD_NO
+# done
