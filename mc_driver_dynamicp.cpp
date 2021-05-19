@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <iterator>
 #include <chrono>
 #include <omp.h>
 #include "rng.h"
@@ -69,7 +70,7 @@ int main(int argc, char* argv[]) {
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    #pragma omp parallel private(x,y,z,u,v,w,E,d,terminate,rxn)
+    #pragma omp parallel firstprivate(x,y,z,u,v,w,E,d,terminate,rxn)
     {
         std::vector<std::pair<float,int> > tracks_private; // give each thread their own smaller, private vector
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
@@ -114,7 +115,7 @@ int main(int argc, char* argv[]) {
     #pragma omp parallel
     {
         #pragma omp for reduction(+:flux)
-        for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
+        for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end(); ++it) {
             flux += it->first;
         }
     } // end parallel region
@@ -124,7 +125,7 @@ int main(int argc, char* argv[]) {
     // initialize iterator at beginning of tracks vector
     std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
     float accumulator = 0.0f;
-    #pragma omp parallel // private accumulator and score_computer_it???
+    #pragma omp parallel firstprivate(accumulator)
     {
         std::vector<float> scores_private; // give each thread their own smaller, private vector
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
