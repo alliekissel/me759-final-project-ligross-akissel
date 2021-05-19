@@ -126,6 +126,7 @@ int main(int argc, char* argv[]) {
     float accumulator = 0.0f;
     #pragma omp parallel // private accumulator and score_computer_it???
     {
+        std::vector<float> scores_private; // give each thread their own smaller, private vector
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(int i=0 ; i < num_histories ; i++) {
             // go through all tracks for given i in vector of pairs
@@ -134,8 +135,10 @@ int main(int argc, char* argv[]) {
                 accumulator += score_computer_it->first; // add the flux to the current score
                 score_computer_it++; // go to the next track in the queue
             }
-            scores.push_back(accumulator);
+            scores_private.push_back(accumulator);
         }
+        #pragma omp critical 
+        scores.insert(scores.end(), scores_private.begin(), scores_private.end()); // each thread dumps it's scores into final vector
     } // end parallel region
 
     #pragma omp parallel 
@@ -169,12 +172,6 @@ int main(int argc, char* argv[]) {
                  duration_ms_histories.count() << "," << 
                  duration_ms_estimator.count() << "," <<  
                  duration_ms_histories.count() + duration_ms_estimator.count() << std::endl;
- 
-    // uncomment to see names with values
-    // std::cout << "estimator is " << flux << " relative error is " << RE << std::endl;
-    // std::cout << "histories total length " << duration_ms_histories.count() << std::endl;
-    // std::cout << "estimator processing length" << duration_ms_estimator.count() << std::endl;
-    // std::cout << "total time" << duration_ms_histories.count()  + duration_ms_estimator.count()  << std::endl;
 
     return 0;
 }
