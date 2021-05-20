@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <math.h>
 #include <vector>
 #include <iterator>
 #include <chrono>
@@ -19,12 +20,12 @@ int   determine_reaction(const float sig_s, const float sig_a);
 void  sample_isotropic(float* u, float* v, float* w);
 void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 
+
 // create one vector of all the tracks and just append in the looping section
 // post process it with a reduce with multiple threads to do efficientlyl and avoid having
 // many threads tyring to touch the same memory address
 
 // this function is responsible for driving and timing the montecarlo simulation
-// TODO_LG
 int main(int argc, char* argv[]) {
     int num_histories = atoi(argv[1]); // number of simulations
     int threads = atoi(argv[2]); // number of threads
@@ -37,12 +38,11 @@ int main(int argc, char* argv[]) {
     duration<float, std::milli> duration_ms_histories;
     // timing variables for the estimator portion
     high_resolution_clock::time_point start_estimator;
-    high_resolution_clock::time_point end_estimator; 
+    high_resolution_clock::time_point end_estimator;
     duration<float, std::milli> duration_ms_estimator;
     // total time
     duration<float, std::milli> duration_total;
 
-    std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -54,21 +54,26 @@ int main(int argc, char* argv[]) {
     float d = 0.0f; // distance to collision
     bool terminate = false; // should simulation be terminated
     int rxn = 0;
+    float score = 0.0f;
+
+    std::vector<float> scores;
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    #pragma omp parallel firstprivate(x,y,z,u,v,w,E,d,terminate,rxn)
+    #pragma omp parallel firstprivate(x,y,z,u,v,w,E,d,terminate,rxn,score)
     {
-        std::vector<std::pair<float,int> > tracks_private; // give each thread their own smaller, private vector
+        std::vector<float> scores_private;
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(int i=0; i < num_histories; i++) {
+            //flux_elem = 0.0f;
+            score = 0.0f;
             terminate = false; // do not terminate simulation until a history-ending event occurs
             x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
             u = 0.0f ; v = 0.0f; w=0.0f;
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
                 d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                tracks_private.push_back(std::make_pair(d,i));
+                score += d;
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                     continue;
@@ -85,10 +90,14 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
+            scores_private.push_back(score);
         }
         #pragma omp critical
-        tracks.insert(tracks.end(), tracks_private.begin(), tracks_private.end()); // each thread dumps it's history into final vector
+        {
+        scores.insert(scores.end(), scores_private.begin(), scores_private.end());
+        }
     } // end parallel region
+
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
 
@@ -96,60 +105,37 @@ int main(int argc, char* argv[]) {
     float flux = 0.0f; // flux estimator
     float RE = 0.0f; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
-    std::vector<float> scores; // compute the score for each particle in order to compute a relative error
+    float subtractor = 0.0f;
 
-    // Add all tracks to flux
     #pragma omp parallel
     {
-        #pragma omp for reduction(+:flux)
-        for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end(); it++) {
-            flux += it->first;
+
+        // Add all tracks to flux
+        #pragma omp for simd nowait reduction(+:flux)
+        for(int i = 0; i < num_histories; i++) {
+            flux += scores[i];
         }
-    } // end parallel region
-    flux /= num_histories*V;
-
-    // TODO_LG sort vector by second or switch the order
-
-    // TODO THIS MAY NEED TO HAPPEN IN SERIAL
-    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
-    // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
-    float accumulator = 0.0f;
-    std::vector<float> scores; // give each thread their own smaller, private vector
-    for(int i=0 ; i < num_histories ; i++) {
-        // go through all tracks for given i in vector of pairs
-        accumulator = 0.0f;
-        while (i == score_computer_it->second && score_computer_it < tracks.end() - 1) {
-            accumulator += score_computer_it->first; // add the flux to the current score
-            score_computer_it++; // go to the next track in the queue
-        }
-        scores_private.push_back(accumulator);
-    }
-
-    #pragma omp parallel 
-    {
+        
         // process scores into a relative error
         // sum the squares
-        #pragma omp for simd reduction(+:RE)
-        for(int i=0 ; i < num_histories ; i++) {
-            RE += scores[i] * scores[i];
+        #pragma omp for simd nowait reduction(+:RE)
+        for(int j=0 ; j < num_histories ; j++) {
+            RE += scores[j] * scores[j];
         }
-    } // end parallel region
-    RE /= num_histories;
-    
-    float subtractor = 0.0f;
-    #pragma omp parallel 
-    {
+
         #pragma omp for simd reduction(+:subtractor)
-        for(int i=0 ; i < num_histories ; i++) {
-            subtractor += scores[i]/num_histories;
+        for(int k=0 ; k < num_histories ; k++) {
+            subtractor += scores[k]/num_histories;
         }
     } // end parallel region
-    
+
+    flux /= num_histories*V;
+    RE /= num_histories;  
     // square the subtractor
     subtractor *= subtractor;
     // correct RE
     RE -= subtractor;
+
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
 
@@ -167,7 +153,11 @@ int main(int argc, char* argv[]) {
 float distance2collision(float mac_XS, float *x, float *y, float *z, const float r, const float u, const float v, const float w, bool *termination) {
     // sample distance to event from exponential distribution
     float xi = gen_rand_0_to_1();
-    float d = -log(xi)/mac_XS; // units of cm
+    float d = -log(xi)/mac_XS; // units of cm  
+    // check to see if d is infinite. If so, return a distance that will always leave the sphere
+    if(isinf(d) == 1) {
+        d = 2*r + 1;
+    } 
     // find if final position is inside or outside of sphere
     float mag_A_sq = (*x)*(*x)+(*y)*(*y)+(*z)*(*z);
     float mag_A = sqrt(mag_A_sq);
@@ -193,8 +183,6 @@ float distance2collision(float mac_XS, float *x, float *y, float *z, const float
             a = 1.0f;
             b = -2*mag_A*costheta;
             c = mag_A_sq - r*r;
-            // TOOD_LG try and justify that we will always take the plus root, if we can't show this, then just take
-            // which ever is positive between the two below. pray that there is never a case where they are both positive
             float d_i_plus = (-b + sqrt(b*b- 4*a*c))/(2*a);
             float d_i_minus = (-b - sqrt(b*b - 4*a*c))/(2*a);
             float d_i  = (d_i_plus >= 0) ? d_i_plus : d_i_minus; // if d_i plus is zero, 4*a*c=0 and thus d_i_minus = -2b and should not be returned
