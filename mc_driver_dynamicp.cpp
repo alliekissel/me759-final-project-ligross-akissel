@@ -19,19 +19,6 @@ int   determine_reaction(const float sig_s, const float sig_a);
 void  sample_isotropic(float* u, float* v, float* w);
 void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 
-// TODO slightly concerned about multiple threads touching the same data/ race conditions
-// possible that reduction will be useful
-struct ESTIMATOR
-{
-    int n; // the number of particles thus farr
-    // TODO_LG should these be single values or arrays
-    // if single value worry about race conditions/false sharing
-    // if array, process at the end, but number on contributions is stochastic, so size is?
-    // perhaps a vector would be best, so we could append contributions
-    float tally_mean;
-    float tally_re;
-};
-
 // create one vector of all the tracks and just append in the looping section
 // post process it with a reduce with multiple threads to do efficientlyl and avoid having
 // many threads tyring to touch the same memory address
@@ -115,32 +102,29 @@ int main(int argc, char* argv[]) {
     #pragma omp parallel
     {
         #pragma omp for reduction(+:flux)
-        for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end(); ++it) {
+        for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end(); it++) {
             flux += it->first;
         }
     } // end parallel region
     flux /= num_histories*V;
 
+    // TODO_LG sort vector by second or switch the order
+
+    // TODO THIS MAY NEED TO HAPPEN IN SERIAL
     // compute vector of scores, i.e. score for each particle. analog, so weight is 1
     // initialize iterator at beginning of tracks vector
     std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
     float accumulator = 0.0f;
-    #pragma omp parallel firstprivate(accumulator)
-    {
-        std::vector<float> scores_private; // give each thread their own smaller, private vector
-        #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
-        for(int i=0 ; i < num_histories ; i++) {
-            // go through all tracks for given i in vector of pairs
-            accumulator = 0.0f;
-            while (i == score_computer_it->second && score_computer_it < tracks.end() - 1) {
-                accumulator += score_computer_it->first; // add the flux to the current score
-                score_computer_it++; // go to the next track in the queue
-            }
-            scores_private.push_back(accumulator);
+    std::vector<float> scores; // give each thread their own smaller, private vector
+    for(int i=0 ; i < num_histories ; i++) {
+        // go through all tracks for given i in vector of pairs
+        accumulator = 0.0f;
+        while (i == score_computer_it->second && score_computer_it < tracks.end() - 1) {
+            accumulator += score_computer_it->first; // add the flux to the current score
+            score_computer_it++; // go to the next track in the queue
         }
-        #pragma omp critical 
-        scores.insert(scores.end(), scores_private.begin(), scores_private.end()); // each thread dumps it's scores into final vector
-    } // end parallel region
+        scores_private.push_back(accumulator);
+    }
 
     #pragma omp parallel 
     {
