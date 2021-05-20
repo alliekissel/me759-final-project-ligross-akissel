@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
     // total time
     duration<float, std::milli> duration_total;
 
-    std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
+    std::vector<float> tracks; // float is track length and int is history number
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     start_histories = high_resolution_clock::now();
     #pragma omp parallel firstprivate(x,y,z,u,v,w,E,d,terminate,rxn,score)
     {
-        std::vector<std::pair<float,int> > tracks_private; // give each thread their own smaller, private vector
+        std::vector<float> tracks_private; // give each thread their own smaller, private vector
         std::vector<float> scores_private;
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(int i=0; i < num_histories; i++) {
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
                 d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                tracks_private.push_back(std::make_pair(d,i));
+                tracks_private.push_back(d);
                 score += d;
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
