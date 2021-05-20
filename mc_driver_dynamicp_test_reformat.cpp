@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <math.h>
 #include <vector>
 #include <iterator>
 #include <chrono>
@@ -19,18 +20,6 @@ int   determine_reaction(const float sig_s, const float sig_a);
 void  sample_isotropic(float* u, float* v, float* w);
 void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 
-// TODO slightly concerned about multiple threads touching the same data/ race conditions
-// possible that reduction will be useful
-struct ESTIMATOR
-{
-    int n; // the number of particles thus farr
-    // TODO_LG should these be single values or arrays
-    // if single value worry about race conditions/false sharing
-    // if array, process at the end, but number on contributions is stochastic, so size is?
-    // perhaps a vector would be best, so we could append contributions
-    float tally_mean;
-    float tally_re;
-};
 
 // create one vector of all the tracks and just append in the looping section
 // post process it with a reduce with multiple threads to do efficientlyl and avoid having
@@ -50,12 +39,11 @@ int main(int argc, char* argv[]) {
     duration<float, std::milli> duration_ms_histories;
     // timing variables for the estimator portion
     high_resolution_clock::time_point start_estimator;
-    high_resolution_clock::time_point end_estimator; 
+    high_resolution_clock::time_point end_estimator;
     duration<float, std::milli> duration_ms_estimator;
     // total time
     duration<float, std::milli> duration_total;
 
-    std::vector<float> tracks; // float is track length and int is history number
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
@@ -75,7 +63,6 @@ int main(int argc, char* argv[]) {
     start_histories = high_resolution_clock::now();
     #pragma omp parallel firstprivate(x,y,z,u,v,w,E,d,terminate,rxn,score)
     {
-        std::vector<float> tracks_private; // give each thread their own smaller, private vector
         std::vector<float> scores_private;
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(int i=0; i < num_histories; i++) {
@@ -87,7 +74,9 @@ int main(int argc, char* argv[]) {
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
                 d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                tracks_private.push_back(d);
+                if(isnan(d) == 1) {
+                    std::cout << "Found a NaN!" << "at index " << i << " and thread number " << omp_get_thread_num() << std::endl;
+                }
                 score += d;
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
@@ -106,23 +95,18 @@ int main(int argc, char* argv[]) {
                 }
             }
             scores_private.push_back(score);
-            //#pragma omp critical
-            //{
-            //std::cout << "I am thread number " << omp_get_thread_num() << " and this is my score " << score << std::endl;
-            //}
         }
         #pragma omp critical
         {
-        tracks.insert(tracks.end(), tracks_private.begin(), tracks_private.end()); // each thread dumps it's history into final vector
         scores.insert(scores.end(), scores_private.begin(), scores_private.end());
         }
     } // end parallel region
 
-    //std::cout << "Final scores vector:" << std::endl;
-    //for(int i=0; i < num_histories; i++) {
-        //std::cout << scores[i] << std::endl;
-    //}
-
+    // for(int i=0; i < num_histories; i++) {
+    //     if(isnan(scores[i]) == 1) {
+    //         std::cout << "Found a NaN!" << "at index " << i << std::endl;
+    //     }
+    // }
 
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
@@ -135,6 +119,7 @@ int main(int argc, char* argv[]) {
 
     #pragma omp parallel
     {
+
         // Add all tracks to flux
         #pragma omp for simd nowait reduction(+:flux)
         for(int i = 0; i < num_histories; i++) {
@@ -144,22 +129,28 @@ int main(int argc, char* argv[]) {
         // process scores into a relative error
         // sum the squares
         #pragma omp for simd nowait reduction(+:RE)
-        for(int i=0 ; i < num_histories ; i++) {
-            RE += scores[i] * scores[i];
+        for(int j=0 ; j < num_histories ; j++) {
+            RE += scores[j] * scores[j];
         }
 
-        #pragma omp for simd nowait reduction(+:subtractor)
-        for(int i=0 ; i < num_histories ; i++) {
-            subtractor += scores[i]/num_histories;
+        #pragma omp for simd reduction(+:subtractor)
+        for(int k=0 ; k < num_histories ; k++) {
+            subtractor += scores[k]/num_histories;
         }
     } // end parallel region
-    
+    std::cout << scores[0] << " " << scores[num_histories - 1] << std::endl;
+
+    std::cout << "Flux before division " << flux << std::endl;
     flux /= num_histories*V;
+    std::cout << "Flux after division " << flux << std::endl;
+    std::cout << "RE before division " << RE << std::endl;
     RE /= num_histories;  
+    std::cout << "RE after division " << RE << std::endl;
     // square the subtractor
     subtractor *= subtractor;
     // correct RE
     RE -= subtractor;
+    std::cout << "RE after subtractor " << RE << std::endl;
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
 
