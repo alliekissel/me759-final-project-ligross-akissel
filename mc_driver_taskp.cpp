@@ -17,19 +17,6 @@ int   determine_reaction(const float sig_s, const float sig_a);
 void  sample_isotropic(float* u, float* v, float* w);
 void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 
-// TODO slightly concerned about multiple threads touching the same data/ race conditions
-// possible that reduction will be useful
-struct ESTIMATOR
-{
-    int n; // the number of particles thus farr
-    // TODO_LG should these be single values or arrays
-    // if single value worry about race conditions/false sharing
-    // if array, process at the end, but number on contributions is stochastic, so size is?
-    // perhaps a vector would be best, so we could append contributions
-    float tally_mean;
-    float tally_re;
-};
-
 // create one vector of all the tracks and just append in the looping section
 // post process it with a reduce with multiple threads to do efficientlyl and avoid having
 // many threads tyring to touch the same memory address
