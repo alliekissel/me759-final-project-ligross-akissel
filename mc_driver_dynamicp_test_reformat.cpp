@@ -67,11 +67,9 @@ int main(int argc, char* argv[]) {
     float d = 0.0f; // distance to collision
     bool terminate = false; // should simulation be terminated
     int rxn = 0;
-    //float flux_elem;
-    float score;
+    float score = 0.0f;
 
     std::vector<float> scores;
-    //std::vector<float> flux_elems;
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
@@ -79,7 +77,6 @@ int main(int argc, char* argv[]) {
     {
         std::vector<std::pair<float,int> > tracks_private; // give each thread their own smaller, private vector
         std::vector<float> scores_private;
-        //std::vector<float> flux_elems_private;
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
         for(int i=0; i < num_histories; i++) {
             //flux_elem = 0.0f;
@@ -108,11 +105,11 @@ int main(int argc, char* argv[]) {
                     }
                 }
             }
-            #pragma omp critical
-            {
             scores_private.push_back(score);
-            std::cout << "I am thread number " << omp_get_thread_num() << " and this is my score " << score << std::endl;
-            }
+            //#pragma omp critical
+            //{
+            //std::cout << "I am thread number " << omp_get_thread_num() << " and this is my score " << score << std::endl;
+            //}
         }
         #pragma omp critical
         {
@@ -121,10 +118,10 @@ int main(int argc, char* argv[]) {
         }
     } // end parallel region
 
-    std::cout << "Final scores vector:" << std::endl;
-    for(int i=0; i < num_histories; i++) {
-        std::cout << scores[i] << std::endl;
-    }
+    //std::cout << "Final scores vector:" << std::endl;
+    //for(int i=0; i < num_histories; i++) {
+        //std::cout << scores[i] << std::endl;
+    //}
 
 
     end_histories = high_resolution_clock::now();
@@ -134,67 +131,31 @@ int main(int argc, char* argv[]) {
     float flux = 0.0f; // flux estimator
     float RE = 0.0f; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
-    //std::vector<float> scores; // compute the score for each particle in order to compute a relative error
-
-    // Add all tracks to flux
-    // #pragma omp parallel shared(tracks)
-    // {
-    //     #pragma omp for reduction(+:flux)
-    //     for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end(); ++it) {
-    //         flux += it->first;
-    //     }
-    // } // end parallel region
-    // Add all tracks to flux
-    #pragma omp parallel for simd reduction(+:flux)
-    for(int i = 0; i < num_histories; i++) {
-        flux += scores[i];
-    }
-    flux /= num_histories*V;
-
-    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
-    // initialize iterator at beginning of tracks vector
-    // std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
-    // float accumulator = 0.0f;
-    //std::sort(tracks.begin(), tracks.end(), sortbysec());
-    //#pragma omp parallel firstprivate(accumulator)
-    //{
-        //std::vector<float> scores_private; // give each thread their own smaller, private vector
-        //std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
-        //#pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
-    // for(int i=0 ; i < num_histories ; i++) {
-    //     // go through all tracks for given i in vector of pairs
-    //     accumulator = 0.0f;
-    //     while (i == score_computer_it->second && score_computer_it < tracks.end() - 1) {
-    //         accumulator += score_computer_it->first; // add the flux to the current score
-    //         score_computer_it++; // go to the next track in the queue
-    //     }
-    //     //scores_private.push_back(accumulator);
-    //     scores.push_back(accumulator);
-    // }
-        //#pragma omp critical 
-        //scores.insert(scores.end(), scores_private.begin(), scores_private.end()); // each thread dumps it's scores into final vector
-    //} // end parallel region
+    float subtractor = 0.0f;
 
     #pragma omp parallel
     {
+        // Add all tracks to flux
+        #pragma omp for simd nowait reduction(+:flux)
+        for(int i = 0; i < num_histories; i++) {
+            flux += scores[i];
+        }
+        
         // process scores into a relative error
         // sum the squares
-        #pragma omp for simd reduction(+:RE)
+        #pragma omp for simd nowait reduction(+:RE)
         for(int i=0 ; i < num_histories ; i++) {
             RE += scores[i] * scores[i];
         }
-    } // end parallel region
-    RE /= num_histories;
-    
-    float subtractor = 0.0f;
-    #pragma omp parallel 
-    {
-        #pragma omp for simd reduction(+:subtractor)
+
+        #pragma omp for simd nowait reduction(+:subtractor)
         for(int i=0 ; i < num_histories ; i++) {
             subtractor += scores[i]/num_histories;
         }
     } // end parallel region
     
+    flux /= num_histories*V;
+    RE /= num_histories;  
     // square the subtractor
     subtractor *= subtractor;
     // correct RE
