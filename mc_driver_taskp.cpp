@@ -2,8 +2,11 @@
 
 #include <iostream>
 #include <cmath>
+#include <math.h>
 #include <vector>
+#include <iterator>
 #include <chrono>
+#include <omp.h>
 #include "rng.h"
 
 const float A=1;
@@ -40,90 +43,101 @@ int main(int argc, char* argv[]) {
     // total time
     duration<float, std::milli> duration_total;
 
-    std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
     float r = 5.0f; // units in cm
     // cross sectin data
     const float sig_s = 0.9; // units in per cm
     const float sig_a = 0.1; // units in per cm
     const float sig_t = sig_s + sig_a;
     float mfp = 1/sig_t;
-    float x, y, z; // position variables, units of cm
-    float u,v,w,E;  // direction and energy
+    float x,y,z = 0.0f; // position variables, units of cm
+    float u,v,w,E = 0.0f;  // direction and energy
+    bool terminate = false; // should simulation be terminated
+    int rxn = 0;
+    float score = 0.0f;
+
+    std::vector<float> scores;
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    for(unsigned int i=0; i < num_histories; i++) {
-        bool terminate = false; // do not terminate simulation until a history-ending event occurs
-        x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
-        u = 0.0f ; v = 0.0f; w=0.0f;
-        sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
-        while(!terminate) { 
-            float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-            tracks.push_back(std::make_pair(d,i));
-            if(terminate) {
-                // particle has escaped geometry as d2c modified terminate to be true, continue to next history
-                continue;
-            } else {
-                // the particle history has not terminated by leaving the geometry
-                // sample reaction type
-                int rxn = determine_reaction(sig_s,sig_a);
-                if(rxn==0) {
-                    // scattering event
-                    energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
-                } else{
-                    // absorption event, history is terminated
-                    terminate=true;
-                }
+    #pragma omp parallel
+    {
+        std::vector<float> scores_private;
+        #pragma omp single no wait 
+        {
+            for(unsigned int i=0; i < num_histories; i++) {
+                #pragma omp task firstprivate(x,y,z,u,v,w,E,terminate,rxn,score) 
+                {
+                    score = 0.0f;
+                    bool terminate = false; // do not terminate simulation until a history-ending event occurs
+                    x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
+                    u = 0.0f ; v = 0.0f; w=0.0f;
+                    sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
+                    while(!terminate) { 
+                        score += distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
+                        if(terminate) {
+                            // particle has escaped geometry as d2c modified terminate to be true, continue to next history
+                            continue;
+                        } else {
+                            // the particle history has not terminated by leaving the geometry
+                            // sample reaction type
+                            rxn = determine_reaction(sig_s,sig_a);
+                            if(rxn==0) {
+                                // scattering event
+                                energy_angle_transfer(&E,&u,&v,&w); // determine outgoing direction and outgoing energy
+                            } else{
+                                // absorption event, history is terminated
+                                terminate=true;
+                            }
+                        }
+                    }
+                    scores_private.push_back(score);
+                } // end task
             }
+        } // end single no wait   //TODO_ALLIE check back to this to make sure all braces / placements are correct
+        #pragma omp critical
+        {
+        scores.insert(scores.end(), scores_private.begin(), scores_private.end());
         }
-    }
+    } // end parallel region
 
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
-    
+
     start_estimator = high_resolution_clock::now();
     float flux; // flux estimator
     float RE; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
-    std::vector<float> scores; // compute the score for each particle in order to compute a relative error
+    float subtractor = 0.0f;
+    
+    #pragma omp parallel
+    {
 
-    // COMPUTE FLUX TODO LG
-    // Add all tracks to flux
-    #pragma omp parallel for shared(tracks) reduction(+:flux)
-    for(std::vector<std::pair<float,int> >::const_iterator it = tracks.begin() ; it < tracks.end() ; it++) {
-        flux += it->first;
-    }
-    // multiplication correction TODO, should this be timed? should this just occur outside the parallel region to avoid complicaitons?
-    flux /= num_histories*V;
-
-
-    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
-    // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::const_iterator score_computer_it = tracks.begin();
-    for(unsigned int i=0 ; i < num_histories ; i++) {
-        float accumulator = 0.0f;
-        while(i==score_computer_it->second){
-            accumulator += score_computer_it->first; // add the flux to the current score
-            score_computer_it++; // go to the next track in the queue
+        // Add all tracks to flux
+        #pragma omp for simd nowait reduction(+:flux)
+        for(int i = 0; i < num_histories; i++) {
+            flux += scores[i];
         }
-        scores.push_back(accumulator);
-    }
+        
+        // process scores into a relative error
+        // sum the squares
+        #pragma omp for simd nowait reduction(+:RE)
+        for(int j=0 ; j < num_histories ; j++) {
+            RE += scores[j] * scores[j];
+        }
 
-    // process scores into a relative error
-    // sum the squares
-    for(unsigned int i=0 ; i < num_histories ; i++) {
-        RE += scores[i] * scores[i];
-    }
-    RE/=num_histories;
-    float subtractor;
-    for(unsigned int i=0 ; i < num_histories ; i++) {
-        // TODO_LG
-        subtractor+=scores[i]/num_histories;
-    }
+        #pragma omp for simd reduction(+:subtractor)
+        for(int k=0 ; k < num_histories ; k++) {
+            subtractor += scores[k]/num_histories;
+        }
+    } // end parallel region
+
+    flux /= num_histories*V;
+    RE /= num_histories;  
     // square the subtractor
-    subtractor*=subtractor;
+    subtractor *= subtractor;
     // correct RE
     RE -= subtractor;
+
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (start_estimator - end_estimator);
 

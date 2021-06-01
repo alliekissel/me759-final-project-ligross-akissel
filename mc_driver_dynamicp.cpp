@@ -51,7 +51,6 @@ int main(int argc, char* argv[]) {
     float mfp = 1/sig_t;
     float x,y,z = 0.0f; // position variables, units of cm
     float u,v,w,E = 0.0f;  // direction and energy
-    float d = 0.0f; // distance to collision
     bool terminate = false; // should simulation be terminated
     int rxn = 0;
     float score = 0.0f;
@@ -60,7 +59,7 @@ int main(int argc, char* argv[]) {
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    #pragma omp parallel firstprivate(x,y,z,u,v,w,E,d,terminate,rxn,score)
+    #pragma omp parallel firstprivate(x,y,z,u,v,w,E,terminate,rxn,score)
     {
         std::vector<float> scores_private;
         #pragma omp for schedule(dynamic,1) // choosing dynamic,1 since each history has a stochastic number of tracks
@@ -72,8 +71,7 @@ int main(int argc, char* argv[]) {
             u = 0.0f ; v = 0.0f; w=0.0f;
             sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
             while(!terminate) { 
-                d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-                score += d;
+                score += distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
                 if(terminate) {
                     // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                     continue;
