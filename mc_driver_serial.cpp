@@ -35,10 +35,8 @@ int main(int argc, char* argv[]) {
     // total time
     duration<float, std::milli> duration_total;
 
-    // create one vector of all the tracks and just append in the looping section
-    // post process it with a reduce with multiple threads to do efficiently and avoid having
-    // many threads tyring to touch the same memory address
-    std::vector<std::pair<float,int> > tracks; // float is track length and int is history number
+    //vector of scores to be updated during each history
+    std::vector<float> scores; // float is track length and int is history number
 
     float r = 5.0f; // units in cm
     // cross sectin data
@@ -55,9 +53,9 @@ int main(int argc, char* argv[]) {
         x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
         u = 0.0f ; v = 0.0f; w=0.0f;
         sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
+        float score = 0.0f;
         while(!terminate) { 
-            float d = distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
-            tracks.push_back(std::make_pair(d,i));
+            score += distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
             if(terminate) {
                 // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                 continue;
@@ -74,6 +72,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
+        scores.push_back(score);
     }
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
@@ -82,27 +81,11 @@ int main(int argc, char* argv[]) {
     float flux = 0.0f; // flux estimator
     float RE = 0.0f; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
-    std::vector<float> scores; // compute the score for each particle in order to compute a relative error
 
-    // Add all tracks to flux
-    for(std::vector<std::pair<float,int> >::iterator it = tracks.begin() ; it < tracks.end() ; it++) {
-        flux += it->first;
+    for(int i = 0 ; i < num_histories ; i++) {
+        flux += scores[i];
     }
     flux /= num_histories*V;
-
-    // compute vector of scores, i.e. score for each particle. analog, so weight is 1
-    // initialize iterator at beginning of tracks vector
-    std::vector<std::pair<float,int> >::iterator score_computer_it = tracks.begin();
-    float accumulator = 0.0f;
-    for(int i=0 ; i < num_histories ; i++) {
-        // go through all tracks for given i in vector of pairs
-        accumulator = 0.0f;
-        while(i==score_computer_it->second && score_computer_it < tracks.end() - 1){
-            accumulator += score_computer_it->first; // add the flux to the current score
-            score_computer_it++; // go to the next track in the queue
-        }
-        scores.push_back(accumulator);
-    }
 
     // process scores into a relative error
     // sum the squares
