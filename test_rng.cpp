@@ -12,7 +12,7 @@ void gen_rand_0_to_1_test3(float* random_sequence, int n);
 
 int main(int argc, char *argv[])
 {
-    int n = 500;
+    int n = 10000;
     int num_trials = 1;
     // create file to write output to
     std::ofstream file;
