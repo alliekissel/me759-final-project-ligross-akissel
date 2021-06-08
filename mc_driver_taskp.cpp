@@ -27,8 +27,8 @@ void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 // this function is responsible for driving and timing the montecarlo simulation
 // TODO_LG
 int main(int argc, char* argv[]) {
-    unsigned int num_histories = atoi(argv[1]); // number of simulations
-    unsigned int threads = atoi(argv[2]); // number of threads
+    int num_histories = atoi(argv[1]); // number of simulations
+    int threads = atoi(argv[2]); // number of threads
     
     omp_set_num_threads(threads);
 
@@ -59,21 +59,23 @@ int main(int argc, char* argv[]) {
 
     // begin timing and parallel region
     start_histories = high_resolution_clock::now();
-    #pragma omp parallel
+    #pragma omp parallel firstprivate(x,y,z,u,v,w,E,terminate,rxn,score) 
     {
         std::vector<float> scores_private;
-        #pragma omp single no wait 
+        #pragma omp single private(scores_private)
         {
-            for(unsigned int i=0; i < num_histories; i++) {
-                #pragma omp task firstprivate(x,y,z,u,v,w,E,terminate,rxn,score) 
+            for(int i=0; i < num_histories; i++) {
+                #pragma omp task firstprivate(scores_private)//firstprivate(x,y,z,u,v,w,E,terminate,rxn,score) 
                 {
                     score = 0.0f;
-                    bool terminate = false; // do not terminate simulation until a history-ending event occurs
+                    terminate = false; // do not terminate simulation until a history-ending event occurs
                     x = 0.0f ; y= 0.0f ; z=0.0f ; E=100.0f; // each new history starts at the origin with energy 100
                     u = 0.0f ; v = 0.0f; w=0.0f;
                     sample_isotropic(&u,&v,&w); // initial direction sampled from isotropic distribution
+                    //std::cout << "Score before while loop " << score << std::endl;
                     while(!terminate) { 
                         score += distance2collision(mfp,&x,&y,&z,r,u,v,w,&terminate); // this function modifies position and terminate, but not u,v,w
+                        //std::cout << "Score in while loop " << score << std::endl;
                         if(terminate) {
                             // particle has escaped geometry as d2c modified terminate to be true, continue to next history
                             continue;
@@ -90,15 +92,42 @@ int main(int argc, char* argv[]) {
                             }
                         }
                     }
+                    //std::cout << "Score after while loop " << score << std::endl;
                     scores_private.push_back(score);
+                    std::cout << "Size of private vector is (in task) " << scores_private.size() << std::endl;
                 } // end task
+                #pragma omp taskwait
+                std::cout << "Size of private vector is (after task) " << scores_private.size() << std::endl;
             }
+        // #pragma omp critical
+        // {
+        // std::cout << "I'm thread number " << omp_get_thread_num() << std::endl;
+        // std::cout << "Size of private vector is " << scores_private.size() << std::endl;
+        // for(int i = 0 ; i < scores_private.size() ; i++) {
+        //     std::cout << scores_private[i] << std::endl;
+        // }
+        // }
+        // #pragma omp critical
+        // scores.insert(scores.end(), scores_private.begin(), scores_private.end());
         } // end single no wait   //TODO_ALLIE check back to this to make sure all braces / placements are correct
+        #pragma omp barrier
         #pragma omp critical
         {
-        scores.insert(scores.end(), scores_private.begin(), scores_private.end());
+        std::cout << "I'm thread number " << omp_get_thread_num() << std::endl;
+        std::cout << "Size of private vector is " << scores_private.size() << std::endl;
+        for(int i = 0 ; i < scores_private.size() ; i++) {
+            std::cout << scores_private[i] << std::endl;
         }
+        }
+        //#pragma omp barrier
+        #pragma omp critical
+        scores.insert(scores.end(), scores_private.begin(), scores_private.end());
     } // end parallel region
+
+    std::cout << "Final vec: size: " << scores.size() << std::endl;
+    for(int i = 0 ; i < scores.size() ; i++) {
+        std::cout << scores[i] << std::endl;
+    }
 
     end_histories = high_resolution_clock::now();
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (start_histories - end_histories);
