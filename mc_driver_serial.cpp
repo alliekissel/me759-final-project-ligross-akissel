@@ -121,6 +121,10 @@ float distance2collision(float mac_XS, float *x, float *y, float *z, const float
     // sample distance to event from exponential distribution
     float xi = gen_rand_0_to_1();
     float d = -log(xi)/mac_XS; // units of cm
+    // check to see if d is infinite. If so, return a distance that will always leave the sphere
+    if(isinf(d) == 1) {
+        d = 2*r + 1;
+    } 
     // find if final position is inside or outside of sphere
     float mag_A_sq = (*x)*(*x)+(*y)*(*y)+(*z)*(*z);
     float mag_A = sqrt(mag_A_sq);
