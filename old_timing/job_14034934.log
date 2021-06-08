@@ -1,0 +1,410 @@
+000 (14034934.000.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.001.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.002.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.003.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.004.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.005.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.006.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.007.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.008.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14034934.009.000) 2021-05-27 15:37:00 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+040 (14034934.004.000) 2021-05-27 15:38:13 Started transferring input files
+	Transferring to host: <128.105.245.113:9618?addrs=128.105.245.113-9618&alias=e313.chtc.wisc.edu&noUDP&sock=slot1_27_4665_aa17_17031>
+...
+040 (14034934.004.000) 2021-05-27 15:38:13 Finished transferring input files
+...
+040 (14034934.001.000) 2021-05-27 15:38:14 Started transferring input files
+	Transferring to host: <128.105.68.12:9618?addrs=128.105.68.12-9618&alias=e2005.chtc.wisc.edu&noUDP&sock=slot1_26_33239_a1e1_17845>
+...
+040 (14034934.006.000) 2021-05-27 15:38:14 Started transferring input files
+	Transferring to host: <128.105.245.146:9618?addrs=128.105.245.146-9618&alias=e346.chtc.wisc.edu&noUDP&sock=slot1_7_39137_4e91_17030>
+...
+040 (14034934.001.000) 2021-05-27 15:38:14 Finished transferring input files
+...
+040 (14034934.006.000) 2021-05-27 15:38:14 Finished transferring input files
+...
+040 (14034934.007.000) 2021-05-27 15:38:14 Started transferring input files
+	Transferring to host: <128.105.245.121:9618?addrs=128.105.245.121-9618&alias=e321.chtc.wisc.edu&noUDP&sock=slot1_16_20475_3d5a_17348>
+...
+040 (14034934.007.000) 2021-05-27 15:38:14 Finished transferring input files
+...
+040 (14034934.009.000) 2021-05-27 15:38:14 Started transferring input files
+	Transferring to host: <128.105.245.190:9618?addrs=128.105.245.190-9618&alias=e2390.chtc.wisc.edu&noUDP&sock=slot1_9_9996_d610_16761>
+...
+040 (14034934.000.000) 2021-05-27 15:38:14 Started transferring input files
+	Transferring to host: <128.105.245.69:9618?addrs=128.105.245.69-9618&alias=e269.chtc.wisc.edu&noUDP&sock=slot1_21_35973_fb90_16741>
+...
+040 (14034934.009.000) 2021-05-27 15:38:14 Finished transferring input files
+...
+040 (14034934.000.000) 2021-05-27 15:38:14 Finished transferring input files
+...
+001 (14034934.004.000) 2021-05-27 15:38:14 Job executing on host: <128.105.245.113:9618?addrs=128.105.245.113-9618&alias=e313.chtc.wisc.edu&noUDP&sock=startd_4527_b953>
+...
+040 (14034934.003.000) 2021-05-27 15:38:14 Started transferring input files
+	Transferring to host: <128.105.245.244:9618?addrs=128.105.245.244-9618&alias=e444.chtc.wisc.edu&noUDP&sock=slot1_10_30944_98e3_16024>
+...
+040 (14034934.003.000) 2021-05-27 15:38:14 Finished transferring input files
+...
+001 (14034934.001.000) 2021-05-27 15:38:15 Job executing on host: <128.105.68.12:9618?addrs=128.105.68.12-9618&alias=e2005.chtc.wisc.edu&noUDP&sock=startd_6659_193e>
+...
+001 (14034934.006.000) 2021-05-27 15:38:15 Job executing on host: <128.105.245.146:9618?addrs=128.105.245.146-9618&alias=e346.chtc.wisc.edu&noUDP&sock=startd_26701_3e5b>
+...
+040 (14034934.005.000) 2021-05-27 15:38:15 Started transferring input files
+	Transferring to host: <128.105.245.176:9618?addrs=128.105.245.176-9618&alias=e376.chtc.wisc.edu&noUDP&sock=slot1_19_38441_e974_6671>
+...
+040 (14034934.005.000) 2021-05-27 15:38:15 Finished transferring input files
+...
+040 (14034934.008.000) 2021-05-27 15:38:15 Started transferring input files
+	Transferring to host: <128.105.245.159:9618?addrs=128.105.245.159-9618&alias=e359.chtc.wisc.edu&noUDP&sock=slot1_9_21484_2be3_16693>
+...
+040 (14034934.008.000) 2021-05-27 15:38:15 Finished transferring input files
+...
+001 (14034934.007.000) 2021-05-27 15:38:15 Job executing on host: <128.105.245.121:9618?addrs=128.105.245.121-9618&alias=e321.chtc.wisc.edu&noUDP&sock=startd_2421_2ee0>
+...
+040 (14034934.002.000) 2021-05-27 15:38:15 Started transferring input files
+	Transferring to host: <128.105.245.88:9618?addrs=128.105.245.88-9618&alias=e288.chtc.wisc.edu&noUDP&sock=slot1_37_17759_926b_18857>
+...
+040 (14034934.002.000) 2021-05-27 15:38:15 Finished transferring input files
+...
+001 (14034934.009.000) 2021-05-27 15:38:15 Job executing on host: <128.105.245.190:9618?addrs=128.105.245.190-9618&alias=e2390.chtc.wisc.edu&noUDP&sock=startd_18687_4e60>
+...
+001 (14034934.000.000) 2021-05-27 15:38:15 Job executing on host: <128.105.245.69:9618?addrs=128.105.245.69-9618&alias=e269.chtc.wisc.edu&noUDP&sock=startd_2479_f75e>
+...
+001 (14034934.003.000) 2021-05-27 15:38:15 Job executing on host: <128.105.245.244:9618?addrs=128.105.245.244-9618&alias=e444.chtc.wisc.edu&noUDP&sock=startd_2664_dc63>
+...
+001 (14034934.005.000) 2021-05-27 15:38:16 Job executing on host: <128.105.245.176:9618?addrs=128.105.245.176-9618&alias=e376.chtc.wisc.edu&noUDP&sock=startd_38349_cd80>
+...
+001 (14034934.008.000) 2021-05-27 15:38:16 Job executing on host: <128.105.245.159:9618?addrs=128.105.245.159-9618&alias=e359.chtc.wisc.edu&noUDP&sock=startd_2539_1f0c>
+...
+001 (14034934.002.000) 2021-05-27 15:38:16 Job executing on host: <128.105.245.88:9618?addrs=128.105.245.88-9618&alias=e288.chtc.wisc.edu&noUDP&sock=startd_11034_fc15>
+...
+006 (14034934.006.000) 2021-05-27 15:38:23 Image size of job updated: 13952
+	10  -  MemoryUsage of job (MB)
+	9860  -  ResidentSetSize of job (KB)
+...
+006 (14034934.001.000) 2021-05-27 15:38:23 Image size of job updated: 58392
+	4  -  MemoryUsage of job (MB)
+	3096  -  ResidentSetSize of job (KB)
+...
+006 (14034934.004.000) 2021-05-27 15:38:24 Image size of job updated: 62252
+	3  -  MemoryUsage of job (MB)
+	2612  -  ResidentSetSize of job (KB)
+...
+006 (14034934.003.000) 2021-05-27 15:38:24 Image size of job updated: 10792
+	8  -  MemoryUsage of job (MB)
+	7228  -  ResidentSetSize of job (KB)
+...
+006 (14034934.008.000) 2021-05-27 15:38:24 Image size of job updated: 36800
+	31  -  MemoryUsage of job (MB)
+	31388  -  ResidentSetSize of job (KB)
+...
+006 (14034934.005.000) 2021-05-27 15:38:24 Image size of job updated: 21480
+	1  -  MemoryUsage of job (MB)
+	416  -  ResidentSetSize of job (KB)
+...
+006 (14034934.007.000) 2021-05-27 15:38:24 Image size of job updated: 7684
+	4  -  MemoryUsage of job (MB)
+	3780  -  ResidentSetSize of job (KB)
+...
+006 (14034934.009.000) 2021-05-27 15:38:24 Image size of job updated: 20304
+	2  -  MemoryUsage of job (MB)
+	1224  -  ResidentSetSize of job (KB)
+...
+006 (14034934.000.000) 2021-05-27 15:38:24 Image size of job updated: 89704
+	1  -  MemoryUsage of job (MB)
+	860  -  ResidentSetSize of job (KB)
+...
+006 (14034934.002.000) 2021-05-27 15:38:26 Image size of job updated: 8668
+	5  -  MemoryUsage of job (MB)
+	4868  -  ResidentSetSize of job (KB)
+...
+006 (14034934.006.000) 2021-05-27 15:43:23 Image size of job updated: 283112
+	265  -  MemoryUsage of job (MB)
+	270652  -  ResidentSetSize of job (KB)
+...
+006 (14034934.001.000) 2021-05-27 15:43:23 Image size of job updated: 283112
+	199  -  MemoryUsage of job (MB)
+	203556  -  ResidentSetSize of job (KB)
+...
+006 (14034934.004.000) 2021-05-27 15:43:24 Image size of job updated: 283112
+	217  -  MemoryUsage of job (MB)
+	221768  -  ResidentSetSize of job (KB)
+...
+006 (14034934.008.000) 2021-05-27 15:43:24 Image size of job updated: 283112
+	258  -  MemoryUsage of job (MB)
+	263976  -  ResidentSetSize of job (KB)
+...
+006 (14034934.003.000) 2021-05-27 15:43:24 Image size of job updated: 283112
+	216  -  MemoryUsage of job (MB)
+	221176  -  ResidentSetSize of job (KB)
+...
+006 (14034934.005.000) 2021-05-27 15:43:24 Image size of job updated: 283112
+	224  -  MemoryUsage of job (MB)
+	229212  -  ResidentSetSize of job (KB)
+...
+006 (14034934.009.000) 2021-05-27 15:43:25 Image size of job updated: 283112
+	262  -  MemoryUsage of job (MB)
+	267908  -  ResidentSetSize of job (KB)
+...
+006 (14034934.000.000) 2021-05-27 15:43:25 Image size of job updated: 283120
+	252  -  MemoryUsage of job (MB)
+	257560  -  ResidentSetSize of job (KB)
+...
+006 (14034934.007.000) 2021-05-27 15:43:25 Image size of job updated: 283112
+	222  -  MemoryUsage of job (MB)
+	226684  -  ResidentSetSize of job (KB)
+...
+006 (14034934.002.000) 2021-05-27 15:43:26 Image size of job updated: 283096
+	234  -  MemoryUsage of job (MB)
+	238764  -  ResidentSetSize of job (KB)
+...
+006 (14034934.006.000) 2021-05-27 15:48:23 Image size of job updated: 545256
+	265  -  MemoryUsage of job (MB)
+	270652  -  ResidentSetSize of job (KB)
+...
+006 (14034934.004.000) 2021-05-27 15:48:24 Image size of job updated: 545256
+	217  -  MemoryUsage of job (MB)
+	221768  -  ResidentSetSize of job (KB)
+...
+006 (14034934.008.000) 2021-05-27 15:48:24 Image size of job updated: 545256
+	258  -  MemoryUsage of job (MB)
+	263976  -  ResidentSetSize of job (KB)
+...
+006 (14034934.001.000) 2021-05-27 15:48:24 Image size of job updated: 545256
+	199  -  MemoryUsage of job (MB)
+	203556  -  ResidentSetSize of job (KB)
+...
+006 (14034934.005.000) 2021-05-27 15:48:25 Image size of job updated: 545256
+	224  -  MemoryUsage of job (MB)
+	229212  -  ResidentSetSize of job (KB)
+...
+006 (14034934.009.000) 2021-05-27 15:48:25 Image size of job updated: 545256
+	262  -  MemoryUsage of job (MB)
+	267908  -  ResidentSetSize of job (KB)
+...
+006 (14034934.000.000) 2021-05-27 15:48:25 Image size of job updated: 545264
+	252  -  MemoryUsage of job (MB)
+	257560  -  ResidentSetSize of job (KB)
+...
+006 (14034934.007.000) 2021-05-27 15:48:26 Image size of job updated: 545256
+	222  -  MemoryUsage of job (MB)
+	226684  -  ResidentSetSize of job (KB)
+...
+006 (14034934.003.000) 2021-05-27 15:48:26 Image size of job updated: 545256
+	216  -  MemoryUsage of job (MB)
+	221176  -  ResidentSetSize of job (KB)
+...
+006 (14034934.002.000) 2021-05-27 15:48:27 Image size of job updated: 545240
+	234  -  MemoryUsage of job (MB)
+	238768  -  ResidentSetSize of job (KB)
+...
+006 (14034934.006.000) 2021-05-27 15:53:24 Image size of job updated: 545256
+	414  -  MemoryUsage of job (MB)
+	423928  -  ResidentSetSize of job (KB)
+...
+006 (14034934.008.000) 2021-05-27 15:53:25 Image size of job updated: 545256
+	473  -  MemoryUsage of job (MB)
+	484132  -  ResidentSetSize of job (KB)
+...
+006 (14034934.001.000) 2021-05-27 15:53:25 Image size of job updated: 545256
+	299  -  MemoryUsage of job (MB)
+	306044  -  ResidentSetSize of job (KB)
+...
+006 (14034934.005.000) 2021-05-27 15:53:25 Image size of job updated: 807404
+	447  -  MemoryUsage of job (MB)
+	457416  -  ResidentSetSize of job (KB)
+...
+006 (14034934.009.000) 2021-05-27 15:53:25 Image size of job updated: 545256
+	501  -  MemoryUsage of job (MB)
+	512796  -  ResidentSetSize of job (KB)
+...
+006 (14034934.000.000) 2021-05-27 15:53:25 Image size of job updated: 545264
+	459  -  MemoryUsage of job (MB)
+	469996  -  ResidentSetSize of job (KB)
+...
+006 (14034934.004.000) 2021-05-27 15:53:25 Image size of job updated: 545256
+	356  -  MemoryUsage of job (MB)
+	363848  -  ResidentSetSize of job (KB)
+...
+006 (14034934.002.000) 2021-05-27 15:53:26 Image size of job updated: 545240
+	428  -  MemoryUsage of job (MB)
+	437496  -  ResidentSetSize of job (KB)
+...
+006 (14034934.007.000) 2021-05-27 15:53:26 Image size of job updated: 545256
+	359  -  MemoryUsage of job (MB)
+	367260  -  ResidentSetSize of job (KB)
+...
+006 (14034934.003.000) 2021-05-27 15:53:28 Image size of job updated: 545256
+	383  -  MemoryUsage of job (MB)
+	391332  -  ResidentSetSize of job (KB)
+...
+006 (14034934.009.000) 2021-05-27 15:53:37 Image size of job updated: 1043324
+	1019  -  MemoryUsage of job (MB)
+	1043192  -  ResidentSetSize of job (KB)
+...
+007 (14034934.009.000) 2021-05-27 15:53:37 Shadow exception!
+	Error from slot1_9@e2390.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1019 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.009.000) 2021-05-27 15:53:37 Job was held.
+	Error from slot1_9@e2390.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1019 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.008.000) 2021-05-27 15:54:02 Image size of job updated: 1042180
+	1018  -  MemoryUsage of job (MB)
+	1042048  -  ResidentSetSize of job (KB)
+...
+007 (14034934.008.000) 2021-05-27 15:54:02 Shadow exception!
+	Error from slot1_9@e359.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1018 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.008.000) 2021-05-27 15:54:02 Job was held.
+	Error from slot1_9@e359.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1018 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.005.000) 2021-05-27 15:54:24 Image size of job updated: 1593836
+	954  -  MemoryUsage of job (MB)
+	976704  -  ResidentSetSize of job (KB)
+...
+007 (14034934.005.000) 2021-05-27 15:54:24 Shadow exception!
+	Error from slot1_19@e376.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 954 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.005.000) 2021-05-27 15:54:24 Job was held.
+	Error from slot1_19@e376.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 954 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.000.000) 2021-05-27 15:54:27 Image size of job updated: 1042712
+	1019  -  MemoryUsage of job (MB)
+	1042580  -  ResidentSetSize of job (KB)
+...
+007 (14034934.000.000) 2021-05-27 15:54:27 Shadow exception!
+	Error from slot1_21@e269.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1019 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.000.000) 2021-05-27 15:54:27 Job was held.
+	Error from slot1_21@e269.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1019 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.002.000) 2021-05-27 15:54:53 Image size of job updated: 1048576
+	1024  -  MemoryUsage of job (MB)
+	1048576  -  ResidentSetSize of job (KB)
+...
+007 (14034934.002.000) 2021-05-27 15:54:53 Shadow exception!
+	Error from slot1_37@e288.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1024 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.002.000) 2021-05-27 15:54:53 Job was held.
+	Error from slot1_37@e288.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1024 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.006.000) 2021-05-27 15:55:18 Image size of job updated: 975476
+	953  -  MemoryUsage of job (MB)
+	975476  -  ResidentSetSize of job (KB)
+...
+007 (14034934.006.000) 2021-05-27 15:55:18 Shadow exception!
+	Error from slot1_7@e346.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 953 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.006.000) 2021-05-27 15:55:18 Job was held.
+	Error from slot1_7@e346.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 953 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.003.000) 2021-05-27 15:55:45 Image size of job updated: 1042260
+	1018  -  MemoryUsage of job (MB)
+	1042260  -  ResidentSetSize of job (KB)
+...
+007 (14034934.003.000) 2021-05-27 15:55:45 Shadow exception!
+	Error from slot1_10@e444.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1018 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.003.000) 2021-05-27 15:55:45 Job was held.
+	Error from slot1_10@e444.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1018 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.004.000) 2021-05-27 15:56:17 Image size of job updated: 958112
+	936  -  MemoryUsage of job (MB)
+	958112  -  ResidentSetSize of job (KB)
+...
+007 (14034934.004.000) 2021-05-27 15:56:17 Shadow exception!
+	Error from slot1_27@e313.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 936 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.004.000) 2021-05-27 15:56:17 Job was held.
+	Error from slot1_27@e313.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 936 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.007.000) 2021-05-27 15:56:26 Image size of job updated: 1042904
+	1019  -  MemoryUsage of job (MB)
+	1042904  -  ResidentSetSize of job (KB)
+...
+007 (14034934.007.000) 2021-05-27 15:56:26 Shadow exception!
+	Error from slot1_16@e321.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1019 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.007.000) 2021-05-27 15:56:26 Job was held.
+	Error from slot1_16@e321.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1019 megabytes.
+	Code 34 Subcode 0
+...
+006 (14034934.001.000) 2021-05-27 15:57:48 Image size of job updated: 1042420
+	1018  -  MemoryUsage of job (MB)
+	1042420  -  ResidentSetSize of job (KB)
+...
+007 (14034934.001.000) 2021-05-27 15:57:48 Shadow exception!
+	Error from slot1_26@e2005.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1018 megabytes.
+	0  -  Run Bytes Sent By Job
+	9662  -  Run Bytes Received By Job
+...
+012 (14034934.001.000) 2021-05-27 15:57:48 Job was held.
+	Error from slot1_26@e2005.chtc.wisc.edu: Job has gone over memory limit of 921 megabytes. Peak usage: 1018 megabytes.
+	Code 34 Subcode 0
+...
+009 (14034934.000.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.001.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.002.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.003.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.004.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.005.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.006.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.007.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.008.000) 2021-06-01 15:11:49 Job was aborted.
+	via condor_rm (by user ligross)
+...
+009 (14034934.009.000) 2021-06-01 15:11:50 Job was aborted.
+	via condor_rm (by user ligross)
+...
