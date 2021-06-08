@@ -21,7 +21,7 @@ echo "thread study"
 g++ mc_driver_dynamicp.cpp rng.cpp -o dynamic_p_simulation 
 for t in {1..20}
 do
-    ./dynamic_p_simulation $((10**7)) t
+    ./dynamic_p_simulation $((10**8)) t
 done
 echo "dynamic timing"
 t_best=12
