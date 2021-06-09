@@ -10,7 +10,7 @@
 export PATH
 . /etc/profile.d/modules.sh
 module load GCC/8.3.0 # OpenMP contained in GCC
-g++ mc_driver_serial.cpp rng.cpp -o serial_simulation 
+g++ mc_driver_serial.cpp rng.cpp -std=c++11 -o serial_simulation 
 echo "serial"
 for i in {4..10}
 do
@@ -18,14 +18,14 @@ do
 done
 echo "dynamic p"
 echo "thread study"
-g++ mc_driver_dynamicp.cpp rng.cpp -o dynamic_p_simulation 
+g++ mc_driver_dynamicp.cpp rng.cpp -std=c++11 -fopenmp -o dynamic_p_simulation
 for t in {1..20}
 do
-    ./dynamic_p_simulation $((10**8)) t
+    ./dynamic_p_simulation $((10**6)) $((t))
 done
 echo "dynamic timing"
 t_best=12
 for i in {4..10}
 do
-    ./dynamic_p_simulation $((10**i)) t_best
+    ./dynamic_p_simulation $((10**i)) $((t_best))
 done

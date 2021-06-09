@@ -4,7 +4,6 @@
 #include <cmath>
 #include <math.h>
 #include <vector>
-#include <iterator>
 #include <chrono>
 #include <omp.h>
 #include "rng.h"
@@ -107,21 +106,26 @@ int main(int argc, char* argv[]) {
 
     #pragma omp parallel
     {
-
         // Add all tracks to flux
-        #pragma omp for simd nowait reduction(+:flux)
+        // no wait let's threads move on after doing their 
+        // assigned trips/loops
+        #pragma omp for nowait reduction(+:flux)
         for(int i = 0; i < num_histories; i++) {
             flux += scores[i];
         }
-        
+
         // process scores into a relative error
         // sum the squares
-        #pragma omp for simd nowait reduction(+:RE)
+        // no wait let's threads move on after doing their 
+        // assigned trips/loops
+        #pragma omp for nowait reduction(+:RE)
         for(int j=0 ; j < num_histories ; j++) {
             RE += scores[j] * scores[j];
         }
 
-        #pragma omp for simd reduction(+:subtractor)
+        // no nowait used becasue there is an implicit barrier after
+        // and it would not do anything that is not already happening
+        #pragma omp for reduction(+:subtractor)
         for(int k=0 ; k < num_histories ; k++) {
             subtractor += scores[k]/num_histories;
         }
