@@ -1,0 +1,257 @@
+000 (14041449.000.000) 2021-06-11 12:50:09 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14041449.001.000) 2021-06-11 12:50:09 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+000 (14041449.002.000) 2021-06-11 12:50:09 Job submitted from host: <128.105.244.191:9618?addrs=128.105.244.191-9618&alias=submit-1.chtc.wisc.edu&noUDP&sock=schedd_2182013_0121>
+...
+040 (14041449.000.000) 2021-06-12 09:20:00 Started transferring input files
+	Transferring to host: <128.105.245.63:9618?addrs=128.105.245.63-9618&alias=e263.chtc.wisc.edu&noUDP&sock=slot1_1_10792_b0b0_68381>
+...
+040 (14041449.000.000) 2021-06-12 09:20:00 Finished transferring input files
+...
+001 (14041449.000.000) 2021-06-12 09:20:01 Job executing on host: <128.105.245.63:9618?addrs=128.105.245.63-9618&alias=e263.chtc.wisc.edu&noUDP&sock=startd_2607_c37d>
+...
+006 (14041449.000.000) 2021-06-12 09:20:10 Image size of job updated: 74368
+	7  -  MemoryUsage of job (MB)
+	6260  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:25:11 Image size of job updated: 1339016
+	189  -  MemoryUsage of job (MB)
+	193260  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:30:12 Image size of job updated: 1587864
+	905  -  MemoryUsage of job (MB)
+	926124  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:35:12 Image size of job updated: 2374296
+	1537  -  MemoryUsage of job (MB)
+	1573512  -  ResidentSetSize of job (KB)
+...
+040 (14041449.001.000) 2021-06-12 09:36:51 Started transferring input files
+	Transferring to host: <128.105.245.251:9618?addrs=128.105.245.251-9618&alias=e2451.chtc.wisc.edu&noUDP&sock=slot1_1_12186_e3a9_68426>
+...
+040 (14041449.001.000) 2021-06-12 09:36:51 Finished transferring input files
+...
+001 (14041449.001.000) 2021-06-12 09:36:52 Job executing on host: <128.105.245.251:9618?addrs=128.105.245.251-9618&alias=e2451.chtc.wisc.edu&noUDP&sock=startd_2839_e576>
+...
+006 (14041449.001.000) 2021-06-12 09:37:01 Image size of job updated: 768792
+	9  -  MemoryUsage of job (MB)
+	8992  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:40:12 Image size of job updated: 3816088
+	2083  -  MemoryUsage of job (MB)
+	2132800  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 09:42:02 Image size of job updated: 1324952
+	100  -  MemoryUsage of job (MB)
+	102284  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:45:13 Image size of job updated: 3947160
+	2661  -  MemoryUsage of job (MB)
+	2724664  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 09:47:02 Image size of job updated: 1457048
+	694  -  MemoryUsage of job (MB)
+	710468  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:50:14 Image size of job updated: 4471448
+	3215  -  MemoryUsage of job (MB)
+	3291872  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 09:52:03 Image size of job updated: 2210712
+	1106  -  MemoryUsage of job (MB)
+	1131672  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 09:55:14 Image size of job updated: 7092888
+	3859  -  MemoryUsage of job (MB)
+	3951516  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 09:57:04 Image size of job updated: 2472856
+	1566  -  MemoryUsage of job (MB)
+	1602988  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 10:00:14 Image size of job updated: 7972004
+	3859  -  MemoryUsage of job (MB)
+	3951516  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:02:04 Image size of job updated: 3914648
+	2042  -  MemoryUsage of job (MB)
+	2090444  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:07:04 Image size of job updated: 3914648
+	2468  -  MemoryUsage of job (MB)
+	2526668  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:12:05 Image size of job updated: 3914648
+	2890  -  MemoryUsage of job (MB)
+	2958864  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:17:06 Image size of job updated: 5225368
+	3290  -  MemoryUsage of job (MB)
+	3368624  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:22:06 Image size of job updated: 7060376
+	3700  -  MemoryUsage of job (MB)
+	3788652  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:27:06 Image size of job updated: 8709824
+	3700  -  MemoryUsage of job (MB)
+	3788652  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 10:35:17 Image size of job updated: 7972004
+	4031  -  MemoryUsage of job (MB)
+	4127380  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 10:40:17 Image size of job updated: 7972004
+	4740  -  MemoryUsage of job (MB)
+	4852900  -  ResidentSetSize of job (KB)
+...
+006 (14041449.000.000) 2021-06-12 10:44:29 Image size of job updated: 8804188
+	4740  -  MemoryUsage of job (MB)
+	4852900  -  ResidentSetSize of job (KB)
+...
+040 (14041449.000.000) 2021-06-12 10:44:29 Started transferring output files
+...
+040 (14041449.000.000) 2021-06-12 10:44:29 Finished transferring output files
+...
+005 (14041449.000.000) 2021-06-12 10:44:29 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 16:43:01, Sys 0 00:00:32  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 16:43:01, Sys 0 00:00:32  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	44370  -  Run Bytes Sent By Job
+	20007  -  Run Bytes Received By Job
+	44370  -  Total Bytes Sent By Job
+	20007  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :    12.00       20        20 
+	   Disk (KB)            :    88    15728640  15910556 
+	   IoHeavy              :                           0 
+	   Memory (MB)          :  4740       15360     15360 
+
+	Job terminated of its own accord at 2021-06-12T15:44:29Z.
+...
+040 (14041449.002.000) 2021-06-12 10:44:30 Started transferring input files
+	Transferring to host: <128.105.245.63:9618?addrs=128.105.245.63-9618&alias=e263.chtc.wisc.edu&noUDP&sock=slot1_1_10792_b0b0_68566>
+...
+040 (14041449.002.000) 2021-06-12 10:44:30 Finished transferring input files
+...
+001 (14041449.002.000) 2021-06-12 10:44:31 Job executing on host: <128.105.245.63:9618?addrs=128.105.245.63-9618&alias=e263.chtc.wisc.edu&noUDP&sock=startd_2607_c37d>
+...
+006 (14041449.002.000) 2021-06-12 10:44:40 Image size of job updated: 773528
+	10  -  MemoryUsage of job (MB)
+	10008  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 10:49:41 Image size of job updated: 1358744
+	92  -  MemoryUsage of job (MB)
+	93948  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 10:54:42 Image size of job updated: 1636760
+	661  -  MemoryUsage of job (MB)
+	676396  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 10:57:10 Image size of job updated: 8709824
+	3981  -  MemoryUsage of job (MB)
+	4076532  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 10:59:42 Image size of job updated: 2488728
+	1131  -  MemoryUsage of job (MB)
+	1158124  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 11:02:10 Image size of job updated: 8709824
+	4569  -  MemoryUsage of job (MB)
+	4678644  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:04:42 Image size of job updated: 3013016
+	1572  -  MemoryUsage of job (MB)
+	1608904  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 11:07:11 Image size of job updated: 8709824
+	5151  -  MemoryUsage of job (MB)
+	5274612  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:09:43 Image size of job updated: 3537304
+	2016  -  MemoryUsage of job (MB)
+	2063756  -  ResidentSetSize of job (KB)
+...
+006 (14041449.001.000) 2021-06-12 11:12:12 Image size of job updated: 8709824
+	5682  -  MemoryUsage of job (MB)
+	5817472  -  ResidentSetSize of job (KB)
+...
+040 (14041449.001.000) 2021-06-12 11:12:40 Started transferring output files
+...
+040 (14041449.001.000) 2021-06-12 11:12:40 Finished transferring output files
+...
+005 (14041449.001.000) 2021-06-12 11:12:40 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 18:59:36, Sys 0 00:00:21  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 18:59:36, Sys 0 00:00:21  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	44372  -  Run Bytes Sent By Job
+	20007  -  Run Bytes Received By Job
+	44372  -  Total Bytes Sent By Job
+	20007  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :    12.00       20        20 
+	   Disk (KB)            :    88    15728640  16014975 
+	   IoHeavy              :                           0 
+	   Memory (MB)          :  5682       15360     15360 
+
+	Job terminated of its own accord at 2021-06-12T16:12:40Z.
+...
+006 (14041449.002.000) 2021-06-12 11:14:44 Image size of job updated: 4192664
+	2540  -  MemoryUsage of job (MB)
+	2600432  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:19:44 Image size of job updated: 4979096
+	3008  -  MemoryUsage of job (MB)
+	3079580  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:24:45 Image size of job updated: 6289816
+	3704  -  MemoryUsage of job (MB)
+	3792448  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:29:46 Image size of job updated: 7076248
+	3704  -  MemoryUsage of job (MB)
+	3792448  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:54:48 Image size of job updated: 7076248
+	4114  -  MemoryUsage of job (MB)
+	4212180  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 11:59:48 Image size of job updated: 7076248
+	4638  -  MemoryUsage of job (MB)
+	4748752  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 12:04:49 Image size of job updated: 7584664
+	5126  -  MemoryUsage of job (MB)
+	5248492  -  ResidentSetSize of job (KB)
+...
+006 (14041449.002.000) 2021-06-12 12:08:02 Image size of job updated: 15941944
+	5126  -  MemoryUsage of job (MB)
+	5248492  -  ResidentSetSize of job (KB)
+...
+040 (14041449.002.000) 2021-06-12 12:08:03 Started transferring output files
+...
+040 (14041449.002.000) 2021-06-12 12:08:03 Finished transferring output files
+...
+005 (14041449.002.000) 2021-06-12 12:08:03 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 16:32:09, Sys 0 00:00:15  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 16:32:09, Sys 0 00:00:15  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	44369  -  Run Bytes Sent By Job
+	20007  -  Run Bytes Received By Job
+	44369  -  Total Bytes Sent By Job
+	20007  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :    12.00       20        20 
+	   Disk (KB)            :    88    15728640  15910556 
+	   IoHeavy              :                           0 
+	   Memory (MB)          :  5126       15360     15360 
+
+	Job terminated of its own accord at 2021-06-12T17:08:02Z.
+...

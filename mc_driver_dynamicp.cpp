@@ -104,12 +104,12 @@ int main(int argc, char* argv[]) {
     float V = 4/3*M_PI*r*r*r; // vollume
     float subtractor = 0.0f;
 
-    #pragma omp parallel
-    {
+    // #pragma omp parallel
+    // {
         // Add all tracks to flux
         // no wait let's threads move on after doing their 
         // assigned trips/loops
-        #pragma omp for nowait reduction(+:flux)
+        // #pragma omp for nowait reduction(+:flux)
         for(int i = 0; i < num_histories; i++) {
             flux += scores[i];
         }
@@ -118,18 +118,18 @@ int main(int argc, char* argv[]) {
         // sum the squares
         // no wait let's threads move on after doing their 
         // assigned trips/loops
-        #pragma omp for nowait reduction(+:RE)
+        // #pragma omp for nowait reduction(+:RE)
         for(int j=0 ; j < num_histories ; j++) {
             RE += scores[j] * scores[j];
         }
 
         // no nowait used becasue there is an implicit barrier after
         // and it would not do anything that is not already happening
-        #pragma omp for reduction(+:subtractor)
+        // #pragma omp for reduction(+:subtractor)
         for(int k=0 ; k < num_histories ; k++) {
             subtractor += scores[k]/num_histories;
         }
-    } // end parallel region
+    // } // end parallel region
 
     flux /= num_histories*V;
     RE /= num_histories;  
