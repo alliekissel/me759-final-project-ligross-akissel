@@ -2,17 +2,17 @@
 
 #include <iostream>
 #include <cmath>
+#include <math.h>
 #include <vector>
 #include <chrono>
 #include "rng.h"
 
 const float A=1;
-// function signatures
-
 
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 
+// function signatures
 float distance2collision(float mac_XS, float *x, float *y, float *z, const float r, const float u, const float v, const float w, bool *termination) ;
 int   determine_reaction(const float sig_s, const float sig_a); 
 void  sample_isotropic(float* u, float* v, float* w);
@@ -22,7 +22,6 @@ void  energy_angle_transfer(float* E, float* u, float* v, float* w);
 int main(int argc, char* argv[]) {
     int num_histories = atoi(argv[1]); // number of simulations
     int threads = atoi(argv[2]); // number of threads
-
 
     // timing variables for the history portion
     high_resolution_clock::time_point start_histories;
@@ -78,30 +77,26 @@ int main(int argc, char* argv[]) {
     duration_ms_histories = std::chrono::duration_cast<duration < float, std::milli> > (end_histories - start_histories);
 
     start_estimator = high_resolution_clock::now();
+
     float flux = 0.0f; // flux estimator
     float RE = 0.0f; // relative error
     float V = 4/3*M_PI*r*r*r; // vollume
-
-    for(int i = 0 ; i < num_histories ; i++) {
-        flux += scores[i];
-    }
-    flux /= num_histories*V;
-
-    // process scores into a relative error
-    // sum the squares
-    for(int i=0 ; i < num_histories ; i++) {
-        RE += scores[i] * scores[i];
-    }
-    RE/=num_histories;
-    // correct with sum/N squared term
     float subtractor = 0.0f;
-    for(int i=0 ; i < num_histories ; i++) {
-        subtractor+=scores[i]/num_histories;
+
+    for(int i = 0; i < num_histories; i++) {
+        float score = scores[i];
+        flux += score;
+        RE += score * score;
+        subtractor += score/num_histories;
     }
+
+    flux /= num_histories*V;
+    RE /= num_histories;  
     // square the subtractor
-    subtractor*=subtractor;
+    subtractor *= subtractor;
     // correct RE
     RE -= subtractor;
+
     end_estimator = high_resolution_clock::now();
     duration_ms_estimator = std::chrono::duration_cast<duration < float, std::milli> > (end_estimator - start_estimator);
 
