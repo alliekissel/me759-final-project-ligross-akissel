@@ -15,7 +15,7 @@ plot_RE = True
 N_vals = np.array([10**4, 10**5, 10**6, 10**7, 10**8, 10**9, 10**10])
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-input_path = dir_path + '/tbest12/'          # CHANGE THIS depending on folder
+input_path = './results/tbest12/'          # CHANGE THIS depending on folder
 
 full_serial_timing = []
 full_parallel_timing = []
