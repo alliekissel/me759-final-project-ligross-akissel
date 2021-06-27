@@ -5,17 +5,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sb
 
-job_id = 14041516   # CHANGE THIS depending on ID
+job_id = 14041084   # CHANGE THIS depending on ID
 num_trials = 10   # CHANGE THIS depending on number of trials for job
 thread_study = True     # change to false if this data isn't included
-plot_average = True
-plot_flux = True
-plot_RE = True
+plot_average = False
+plot_flux = False
+plot_RE = False
 
 N_vals = np.array([10**4, 10**5, 10**6, 10**7, 10**8, 10**9, 10**10])
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-input_path = './results/tbest12/'          # CHANGE THIS depending on folder
+input_path = './results/first_timing/'          # CHANGE THIS depending on folder
 
 full_serial_timing = []
 full_parallel_timing = []
@@ -77,6 +77,7 @@ for job in [job_id]:        # make job_id a list if you want to process more tha
 for job in jobs:
     process_results(job)
 
+
 # Create data frame containing all job trial timing data 
 df_full_serial_timing = pd.DataFrame(full_serial_timing, columns=N_vals)
 df_full_parallel_timing = pd.DataFrame(full_parallel_timing, columns=N_vals)
@@ -84,6 +85,11 @@ print("Serial timing data from all job trials, row=job_trial, column=N:")
 print(df_full_serial_timing)
 print("Parallel timing data from all job trials, row=job_trial, column=N:")
 print(df_full_parallel_timing)
+
+# Speedups for each individual trial
+df_full_speedup = df_full_serial_timing / df_full_parallel_timing
+print("Speedup from all job trials, row=job_trial, column=N:")
+print(df_full_speedup)
 
 if plot_average == True:
     df_full_serial_average = df_full_serial_timing.mean(axis=0)
