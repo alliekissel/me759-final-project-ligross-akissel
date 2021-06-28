@@ -6,7 +6,7 @@ log = job_$(Cluster).log
 error = job_$(Cluster)_$(Process).err
 output = job_$(Cluster)_$(Process).out
 
-executable = driver.sh
+executable = serial_driver.sh
 # arguments = LEAVE COMMENTED OUT
 
 should_transfer_files = YES
