@@ -91,6 +91,11 @@ df_full_speedup = df_full_serial_timing / df_full_parallel_timing
 print("Speedup from all job trials, row=job_trial, column=N:")
 print(df_full_speedup)
 
+# Speedups for each individual trial
+df_full_speedup_average = df_full_serial_timing.mean(axis=0) / df_full_parallel_timing.mean(axis=0)
+print("Speedup from all job trials, row=job_trial, column=N:")
+print(df_full_speedup_average)
+
 if plot_average == True:
     df_full_serial_average = df_full_serial_timing.mean(axis=0)
     df_full_serial_stddev = df_full_serial_timing.std(axis=0)
