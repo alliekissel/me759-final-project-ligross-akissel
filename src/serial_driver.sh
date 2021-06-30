@@ -18,7 +18,7 @@ do
 done
 echo "dynamic p"
 # echo "thread study"
-# g++ mc_driver_dynamicp.cpp rng.cpp -std=c++11 -fopenmp -o dynamic_p_simulation
+g++ mc_driver_dynamicp.cpp rng.cpp -std=c++11 -fopenmp -o dynamic_p_simulation
 # for t in {1..20}
 # do
 #     ./dynamic_p_simulation $((10**6)) $((t))
